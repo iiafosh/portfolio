@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Mail, Check, FileText, ArrowRight, Database, Terminal, UserCheck } from 'lucide-react'
 import { GithubIcon } from '@/components/icons/GithubIcon'
@@ -19,7 +19,27 @@ import { playCyberBlip, playCyberPowerUp } from '@/utils/cyberAudio'
 export const AboutPage: React.FC = () => {
   const [copied, setCopied] = useState(false)
   const [isResumeOpen, setIsResumeOpen] = useState(false)
+  const [activeCard, setActiveCard] = useState<'name' | 'github' | 'linkedin' | 'resume' | null>(null)
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const email = '8251677@horus.edu.eg'
+
+  const handleCardEnter = (card: 'name' | 'github' | 'linkedin' | 'resume') => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+    setActiveCard(card)
+  }
+
+  const handleCardLeave = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+    hoverTimeoutRef.current = setTimeout(() => {
+      setActiveCard(null)
+    }, 180)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+    }
+  }, [])
 
   const handleCopyEmail = (e: React.MouseEvent) => {
     navigator.clipboard.writeText(email)
@@ -30,6 +50,8 @@ export const AboutPage: React.FC = () => {
   }
 
   const handleOpenResume = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+    setActiveCard(null)
     playCyberBlip(750)
     setIsResumeOpen(true)
   }
@@ -74,7 +96,11 @@ export const AboutPage: React.FC = () => {
         <div className="space-y-3 font-mono text-sm sm:text-base text-zinc-300 leading-relaxed max-w-3xl">
           <p>
             I'm{' '}
-            <LinkedInHoverCard>
+            <LinkedInHoverCard
+              isOpen={activeCard === 'name'}
+              onMouseEnter={() => handleCardEnter('name')}
+              onMouseLeave={handleCardLeave}
+            >
               <strong className="text-white font-bold font-['Chakra_Petch',sans-serif] text-base sm:text-lg hover:text-cyan-300 transition-colors">
                 Mostafa Kamal Shabara
               </strong>
@@ -119,7 +145,12 @@ export const AboutPage: React.FC = () => {
           </button>
 
           {/* GitHub Icon Button with Hover Preview Card */}
-          <GitHubHoverCard align="center">
+          <GitHubHoverCard
+            isOpen={activeCard === 'github'}
+            onMouseEnter={() => handleCardEnter('github')}
+            onMouseLeave={handleCardLeave}
+            align="center"
+          >
             <a
               href="https://github.com/iiafosh"
               target="_blank"
@@ -132,7 +163,12 @@ export const AboutPage: React.FC = () => {
           </GitHubHoverCard>
 
           {/* LinkedIn Icon Button with Hover Preview Card */}
-          <LinkedInHoverCard align="center">
+          <LinkedInHoverCard
+            isOpen={activeCard === 'linkedin'}
+            onMouseEnter={() => handleCardEnter('linkedin')}
+            onMouseLeave={handleCardLeave}
+            align="center"
+          >
             <a
               href="https://www.linkedin.com/in/mostafa-kamal-3731453a9/"
               target="_blank"
@@ -145,7 +181,13 @@ export const AboutPage: React.FC = () => {
           </LinkedInHoverCard>
 
           {/* Resume / CV Icon Button with Hover Preview Card */}
-          <ResumeHoverCard align="center" onOpenModal={handleOpenResume}>
+          <ResumeHoverCard
+            isOpen={activeCard === 'resume'}
+            onMouseEnter={() => handleCardEnter('resume')}
+            onMouseLeave={handleCardLeave}
+            align="center"
+            onOpenModal={handleOpenResume}
+          >
             <button
               type="button"
               onClick={handleOpenResume}

@@ -3,41 +3,71 @@ import { playCyberBlip } from '@/utils/cyberAudio'
 
 interface LinkedInHoverCardProps {
   children: React.ReactNode
+  isOpen?: boolean
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
   align?: 'left' | 'center' | 'right'
   className?: string
 }
 
 export const LinkedInHoverCard: React.FC<LinkedInHoverCardProps> = ({
   children,
+  isOpen: controlledIsOpen,
+  onMouseEnter: controlledOnMouseEnter,
+  onMouseLeave: controlledOnMouseLeave,
   align = 'center',
   className = '',
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const isControlled = controlledIsOpen !== undefined
+  const isOpen = isControlled ? controlledIsOpen : internalIsOpen
+
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleMouseEnter = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    playCyberBlip(750)
-    setIsOpen(true)
+    if (isControlled) {
+      playCyberBlip(750)
+      controlledOnMouseEnter?.()
+    } else {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      playCyberBlip(750)
+      setInternalIsOpen(true)
+    }
   }
 
   const handleMouseLeave = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    timeoutRef.current = setTimeout(() => {
-      setIsOpen(false)
-    }, 200)
+    if (isControlled) {
+      controlledOnMouseLeave?.()
+    } else {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => {
+        setInternalIsOpen(false)
+      }, 200)
+    }
   }
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setIsOpen((prev) => !prev)
+    if (isControlled) {
+      if (isOpen) {
+        controlledOnMouseLeave?.()
+      } else {
+        controlledOnMouseEnter?.()
+      }
+    } else {
+      setInternalIsOpen((prev) => !prev)
+    }
   }
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
+        if (isControlled) {
+          controlledOnMouseLeave?.()
+        } else {
+          setInternalIsOpen(false)
+        }
       }
     }
     document.addEventListener('mousedown', handleOutsideClick)
@@ -45,7 +75,7 @@ export const LinkedInHoverCard: React.FC<LinkedInHoverCardProps> = ({
       document.removeEventListener('mousedown', handleOutsideClick)
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
-  }, [])
+  }, [isControlled, controlledOnMouseLeave])
 
   // Alignment classes for popover position
   const alignClass =
@@ -73,10 +103,17 @@ export const LinkedInHoverCard: React.FC<LinkedInHoverCardProps> = ({
           role="tooltip"
           className={`absolute bottom-full mb-3 z-[100] ${alignClass} w-[320px] max-w-[calc(100vw-2rem)] text-left rounded-2xl overflow-hidden bg-[#1b1f23] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] animate-in fade-in zoom-in-95 duration-150 font-sans pointer-events-auto`}
           onMouseEnter={() => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current)
+            if (isControlled) {
+              controlledOnMouseEnter?.()
+            } else if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current)
+            }
           }}
           onMouseLeave={handleMouseLeave}
         >
+          {/* Hit-test bridge between trigger and card */}
+          <div className="absolute top-full left-0 w-full h-4 pointer-events-auto" />
+
           {/* LinkedIn Blue Abstract Banner Header (exact yust.dev style) */}
           <div
             className="relative h-[64px] w-full bg-gradient-to-br from-[#0a66c2] to-[#0a66c280]"
