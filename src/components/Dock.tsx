@@ -5,9 +5,7 @@ import { MetallicHouse } from '@/components/icons/metallic/MetallicHouse'
 import { MetallicFolder } from '@/components/icons/metallic/MetallicFolder'
 import { MetallicTrophy } from '@/components/icons/metallic/MetallicTrophy'
 import { MetallicDatabase } from '@/components/icons/metallic/MetallicDatabase'
-import { MetallicGoose } from '@/components/icons/metallic/MetallicGoose'
 import { GithubIcon } from '@/components/icons/GithubIcon'
-import { triggerSlimeBloop } from '@/utils/slimeEasterEgg'
 import { LogOut } from 'lucide-react'
 
 export const Dock: React.FC = () => {
@@ -50,21 +48,6 @@ export const Dock: React.FC = () => {
         })}
 
         <div className="w-[1px] h-5 bg-white/10 mx-1" />
-
-        {/* Release Desktop Mascot Button (exact yust.dev style duck button) */}
-        <button
-          onClick={triggerSlimeBloop}
-          type="button"
-          aria-label="Release the desktop mascot"
-          title="🪿 Release Desktop Mascot"
-          className="group flex items-center justify-center rounded-full p-1.5 sm:p-2 text-zinc-400 hover:text-white hover:bg-white/10 transition-all duration-200 active:scale-95"
-        >
-          <span className="group-hover:rotate-12 transition-transform duration-200 inline-block">
-            <MetallicGoose className="w-5 h-5" />
-          </span>
-        </button>
-
-        <div className="w-[1px] h-5 bg-white/10 mx-0.5" />
 
         {/* GitHub Auth Section */}
         {user ? (
