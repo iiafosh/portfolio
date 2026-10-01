@@ -15,11 +15,16 @@ import { NotFound } from '@/pages/NotFound'
 
 import { StatusFooter } from '@/components/StatusFooter'
 
+import { SlimeMascot } from '@/components/SlimeMascot'
+
 // Root layout with exact yust.dev style floating dock, ambient glows, noise texture, and focused container
 const rootRoute = createRootRoute({
   component: () => (
     <div className="min-h-screen bg-[#07080e] text-zinc-300 font-sans antialiased relative selection:bg-cyan-500/20 selection:text-cyan-200 flex flex-col justify-between overflow-x-hidden">
       
+      {/* Interactive Blue Slime Cursor Mascot */}
+      <SlimeMascot />
+
       {/* Ambient chromatic light spotlights */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         {/* Top-center electric cyan spotlight */}

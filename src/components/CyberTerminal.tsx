@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Terminal, CornerDownLeft } from 'lucide-react'
 import { playCyberBlip, playLaserSound, playCyberPowerUp } from '@/utils/cyberAudio'
-import { triggerGooseHonk } from '@/utils/gooseEasterEgg'
+import { triggerSlimeBloop } from '@/utils/slimeEasterEgg'
 
 interface LogEntry {
   command: string
@@ -55,7 +55,7 @@ export const CyberTerminal: React.FC = () => {
             <p><span className="text-emerald-400 font-bold">matrix</span> - Toggle cyber digital rain simulator</p>
             <p><span className="text-emerald-400 font-bold">db</span> - Ping Supabase PostgreSQL connection</p>
             <p><span className="text-emerald-400 font-bold">sudo hire</span> - Direct contract &amp; recruitment payload</p>
-            <p><span className="text-emerald-400 font-bold">honk</span> - Trigger retro 8-bit goose celebration</p>
+            <p><span className="text-emerald-400 font-bold">slime</span> - Trigger cute blue slime mascot celebration</p>
             <p><span className="text-emerald-400 font-bold">clear</span> - Flush terminal buffer</p>
           </div>
         )
@@ -111,7 +111,7 @@ export const CyberTerminal: React.FC = () => {
       case 'sudo hire':
       case 'hire':
         playCyberPowerUp()
-        triggerGooseHonk()
+        triggerSlimeBloop()
         response = (
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 space-y-1 font-mono text-xs">
             <p className="font-bold text-white text-sm">🎉 CONTRACT UNLOCKED // HIRE REQUEST READY</p>
@@ -123,9 +123,11 @@ export const CyberTerminal: React.FC = () => {
         type = 'success'
         break
 
+      case 'slime':
+      case 'bloop':
       case 'honk':
-        triggerGooseHonk()
-        response = <p className="text-amber-300 font-bold">🪿 HONK! Goose energy unleashed across viewport.</p>
+        triggerSlimeBloop()
+        response = <p className="text-cyan-300 font-bold">💧 BLOOP! Blue slime mascot unleashed across viewport.</p>
         break
 
       case 'clear':

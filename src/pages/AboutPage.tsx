@@ -13,7 +13,7 @@ import { LinkedInResumeModal } from '@/components/LinkedInResumeModal'
 import { LinkedInHoverCard } from '@/components/LinkedInHoverCard'
 import { GitHubHoverCard } from '@/components/GitHubHoverCard'
 import { ResumeHoverCard } from '@/components/ResumeHoverCard'
-import { triggerGooseHonk } from '@/utils/gooseEasterEgg'
+import { triggerSlimeBloop } from '@/utils/slimeEasterEgg'
 import { playCyberBlip, playCyberPowerUp } from '@/utils/cyberAudio'
 
 export const AboutPage: React.FC = () => {
@@ -45,7 +45,7 @@ export const AboutPage: React.FC = () => {
     navigator.clipboard.writeText(email)
     setCopied(true)
     playCyberPowerUp()
-    triggerGooseHonk(e)
+    triggerSlimeBloop(e)
     setTimeout(() => setCopied(false), 2200)
   }
 
@@ -79,8 +79,8 @@ export const AboutPage: React.FC = () => {
           </p>
           <div className="flex flex-wrap items-baseline gap-4">
             <h1
-              onClick={triggerGooseHonk}
-              title="Click to unleash cyber pulse"
+              onClick={triggerSlimeBloop}
+              title="Click to unleash slime cyber pulse"
               className="font-['Orbitron',sans-serif] text-5xl sm:text-7xl md:text-8xl font-black tracking-tight cursor-pointer select-none transition-all duration-300 inline-block bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(6,182,212,0.45)] hover:brightness-125"
             >
               MOSTAFA
