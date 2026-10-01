@@ -21,8 +21,18 @@ export const AboutPage: React.FC = () => {
   const [copied, setCopied] = useState(false)
   const [isResumeOpen, setIsResumeOpen] = useState(false)
   const [activeCard, setActiveCard] = useState<'name' | 'github' | 'linkedin' | 'resume' | null>(null)
+  const [anghamiUrl, setAnghamiUrl] = useState('https://play.anghami.com')
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const email = '8251677@horus.edu.eg'
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('anghami_profile_url')
+      if (saved) setAnghamiUrl(saved)
+    } catch {
+      // ignore
+    }
+  }, [])
 
   const handleCardEnter = (card: 'name' | 'github' | 'linkedin' | 'resume') => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
@@ -201,7 +211,7 @@ export const AboutPage: React.FC = () => {
 
           {/* Anghami Profile Link */}
           <a
-            href="https://play.anghami.com"
+            href={anghamiUrl}
             target="_blank"
             rel="noopener noreferrer"
             title="Anghami Music Profile"
