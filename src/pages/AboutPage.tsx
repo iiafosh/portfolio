@@ -127,16 +127,18 @@ export const AboutPage: React.FC = () => {
             <GithubIcon className="w-5 h-5" />
           </a>
 
-          {/* LinkedIn Icon Button */}
-          <a
-            href="https://www.linkedin.com/in/mostafa-kamal-3731453a9/"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="LinkedIn Profile"
-            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-sky-500/15 text-zinc-400 hover:text-sky-400 border border-white/10 hover:border-sky-500/30 transition-all active:scale-95 shadow-sm"
-          >
-            <LinkedInIcon className="w-5 h-5" />
-          </a>
+          {/* LinkedIn Icon Button with Hover Preview Card */}
+          <LinkedInHoverCard align="center">
+            <a
+              href="https://www.linkedin.com/in/mostafa-kamal-3731453a9/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="LinkedIn Profile (Hover for card)"
+              className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-sky-500/15 text-zinc-400 hover:text-sky-400 border border-white/10 hover:border-sky-500/30 transition-all active:scale-95 shadow-sm"
+            >
+              <LinkedInIcon className="w-5 h-5" />
+            </a>
+          </LinkedInHoverCard>
 
           {/* Resume Modal Trigger Icon Button */}
           <button
