@@ -11,6 +11,8 @@ import { BentoProjects } from '@/components/BentoProjects'
 import { GearsAndSetup } from '@/components/GearsAndSetup'
 import { LinkedInResumeModal } from '@/components/LinkedInResumeModal'
 import { LinkedInHoverCard } from '@/components/LinkedInHoverCard'
+import { GitHubHoverCard } from '@/components/GitHubHoverCard'
+import { ResumeHoverCard } from '@/components/ResumeHoverCard'
 import { triggerGooseHonk } from '@/utils/gooseEasterEgg'
 import { playCyberBlip, playCyberPowerUp } from '@/utils/cyberAudio'
 
@@ -116,16 +118,18 @@ export const AboutPage: React.FC = () => {
             )}
           </button>
 
-          {/* GitHub Icon Button */}
-          <a
-            href="https://github.com/iiafosh"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="GitHub Profile (@iiafosh)"
-            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 hover:border-white/20 transition-all active:scale-95"
-          >
-            <GithubIcon className="w-5 h-5" />
-          </a>
+          {/* GitHub Icon Button with Hover Preview Card */}
+          <GitHubHoverCard align="center">
+            <a
+              href="https://github.com/iiafosh"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="GitHub Profile (@iiafosh)"
+              className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 hover:border-white/20 transition-all active:scale-95"
+            >
+              <GithubIcon className="w-5 h-5" />
+            </a>
+          </GitHubHoverCard>
 
           {/* LinkedIn Icon Button with Hover Preview Card */}
           <LinkedInHoverCard align="center">
@@ -140,15 +144,17 @@ export const AboutPage: React.FC = () => {
             </a>
           </LinkedInHoverCard>
 
-          {/* Resume Modal Trigger Icon Button */}
-          <button
-            type="button"
-            onClick={handleOpenResume}
-            title="View Verified CV & Biography"
-            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-cyan-300 border border-white/10 hover:border-cyan-400/40 transition-all active:scale-95"
-          >
-            <UserCheck className="w-5 h-5" />
-          </button>
+          {/* Resume / CV Icon Button with Hover Preview Card */}
+          <ResumeHoverCard align="center" onOpenModal={handleOpenResume}>
+            <button
+              type="button"
+              onClick={handleOpenResume}
+              title="View Verified CV & Biography (Hover for preview)"
+              className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-cyan-300 border border-white/10 hover:border-cyan-400/40 transition-all active:scale-95"
+            >
+              <UserCheck className="w-5 h-5" />
+            </button>
+          </ResumeHoverCard>
 
           {/* Source Code Repo */}
           <a
