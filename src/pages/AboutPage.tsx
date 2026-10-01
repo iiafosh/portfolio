@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Mail, Check, FileText, ArrowRight, Database, Terminal, UserCheck } from 'lucide-react'
+import { Mail, Check, FileText, ArrowRight, Database, Terminal } from 'lucide-react'
 import { GithubIcon } from '@/components/icons/GithubIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
 import { GamingHUD } from '@/components/GamingHUD'
@@ -191,23 +191,12 @@ export const AboutPage: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenResume}
-              title="View Verified CV & Biography (Hover for preview)"
+              title="Curriculum Vitae & Verified Credentials (Hover for preview)"
               className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-cyan-300 border border-white/10 hover:border-cyan-400/40 transition-all active:scale-95"
             >
-              <UserCheck className="w-5 h-5" />
+              <FileText className="w-5 h-5" />
             </button>
           </ResumeHoverCard>
-
-          {/* Source Code Repo */}
-          <a
-            href="https://github.com/iiafosh/portfolio"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="View Portfolio Repository on GitHub"
-            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-zinc-300 border border-white/10 transition-colors active:scale-95"
-          >
-            <FileText className="w-4 h-4" />
-          </a>
 
         </div>
 
