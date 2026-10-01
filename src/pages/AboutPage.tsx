@@ -10,6 +10,7 @@ import { SelectedOutcomes } from '@/components/SelectedOutcomes'
 import { BentoProjects } from '@/components/BentoProjects'
 import { GearsAndSetup } from '@/components/GearsAndSetup'
 import { LinkedInResumeModal } from '@/components/LinkedInResumeModal'
+import { LinkedInHoverCard } from '@/components/LinkedInHoverCard'
 import { triggerGooseHonk } from '@/utils/gooseEasterEgg'
 import { playCyberBlip, playCyberPowerUp } from '@/utils/cyberAudio'
 
@@ -67,10 +68,16 @@ export const AboutPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Bio Copy with LinkedIn Education */}
+        {/* Bio Copy with LinkedIn Hover Card */}
         <div className="space-y-3 font-mono text-sm sm:text-base text-zinc-300 leading-relaxed max-w-3xl">
           <p>
-            I'm <strong className="text-white font-bold font-['Chakra_Petch',sans-serif] text-base sm:text-lg">Mostafa Kamal Shabara</strong>, an AI &amp; Software Engineering student at{' '}
+            I'm{' '}
+            <LinkedInHoverCard>
+              <strong className="text-white font-bold font-['Chakra_Petch',sans-serif] text-base sm:text-lg hover:text-cyan-300 transition-colors">
+                Mostafa Kamal Shabara
+              </strong>
+            </LinkedInHoverCard>
+            , an AI &amp; Software Engineering student at{' '}
             <a
               href="https://horus.edu.eg"
               target="_blank"
@@ -87,72 +94,71 @@ export const AboutPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons Row matching yust.dev */}
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2">
           
-          {/* Copy Email Button */}
+          {/* Copy Email Button (clean high-contrast pill) */}
           <button
             type="button"
             onClick={handleCopyEmail}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-400 hover:from-cyan-300 hover:to-teal-200 text-zinc-950 font-bold font-['Orbitron',sans-serif] text-xs sm:text-sm transition-all duration-200 active:scale-95 shadow-[0_0_25px_rgba(6,182,212,0.45)] hover:shadow-[0_0_35px_rgba(6,182,212,0.65)] hover:scale-[1.02]"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold font-sans text-xs sm:text-sm transition-all duration-200 active:scale-95 shadow-[0_4px_16px_rgba(255,255,255,0.15)] hover:scale-[1.02]"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4 text-emerald-950" />
-                <span>COPIED EMAIL!</span>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>Copied email!</span>
               </>
             ) : (
               <>
-                <Mail className="w-4 h-4 text-zinc-950" />
-                <span>COPY MY EMAIL</span>
+                <Mail className="w-4 h-4 text-zinc-900" />
+                <span>Copy my email</span>
               </>
             )}
           </button>
 
-          {/* LinkedIn Profile Modal Trigger */}
-          <button
-            type="button"
-            onClick={handleOpenResume}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500/15 via-purple-500/15 to-indigo-500/15 hover:bg-indigo-500/25 text-indigo-200 hover:text-white border border-indigo-500/40 hover:border-indigo-400 font-['Chakra_Petch',sans-serif] font-bold text-xs sm:text-sm transition-all group shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+          {/* GitHub Icon Button */}
+          <a
+            href="https://github.com/iiafosh"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="GitHub Profile (@iiafosh)"
+            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 hover:border-white/20 transition-all active:scale-95"
           >
-            <UserCheck className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
-            <span>LinkedIn CV &amp; Bio</span>
-          </button>
+            <GithubIcon className="w-5 h-5" />
+          </a>
 
-          {/* Direct LinkedIn Link */}
+          {/* LinkedIn Icon Button */}
           <a
             href="https://www.linkedin.com/in/mostafa-kamal-3731453a9/"
             target="_blank"
             rel="noopener noreferrer"
             title="LinkedIn Profile"
-            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400 font-mono text-xs sm:text-sm transition-all gap-2 shadow-[0_0_12px_rgba(14,165,233,0.15)]"
+            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-sky-500/15 text-zinc-400 hover:text-sky-400 border border-white/10 hover:border-sky-500/30 transition-all active:scale-95 shadow-sm"
           >
-            <LinkedInIcon className="w-4 h-4 text-sky-400" />
-            <span className="hidden sm:inline font-mono">LinkedIn</span>
+            <LinkedInIcon className="w-5 h-5" />
           </a>
 
-          {/* GitHub Profile */}
-          <a
-            href="https://github.com/iiafosh"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="GitHub Profile"
-            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 font-mono text-xs sm:text-sm transition-colors gap-2"
+          {/* Resume Modal Trigger Icon Button */}
+          <button
+            type="button"
+            onClick={handleOpenResume}
+            title="View Verified CV & Biography"
+            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-cyan-300 border border-white/10 hover:border-cyan-400/40 transition-all active:scale-95"
           >
-            <GithubIcon className="w-4 h-4" />
-            <span className="hidden sm:inline font-mono">GitHub</span>
-          </a>
+            <UserCheck className="w-5 h-5" />
+          </button>
 
-          {/* Source Code */}
+          {/* Source Code Repo */}
           <a
             href="https://github.com/iiafosh/portfolio"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 font-mono text-xs sm:text-sm transition-colors gap-2"
+            title="View Portfolio Repository on GitHub"
+            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-500 hover:text-zinc-300 border border-white/10 transition-colors active:scale-95"
           >
             <FileText className="w-4 h-4" />
-            <span className="hidden sm:inline font-mono">Repo</span>
           </a>
+
         </div>
 
       </section>
