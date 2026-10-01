@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { Mail, Check, FileText, ArrowRight, Database, Terminal } from 'lucide-react'
 import { GithubIcon } from '@/components/icons/GithubIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
+import { AnghamiIcon } from '@/components/icons/AnghamiIcon'
 import { GamingHUD } from '@/components/GamingHUD'
 import { CyberTerminal } from '@/components/CyberTerminal'
 import { GitHubActivity } from '@/components/GitHubActivity'
@@ -197,6 +198,17 @@ export const AboutPage: React.FC = () => {
               <FileText className="w-5 h-5" />
             </button>
           </ResumeHoverCard>
+
+          {/* Anghami Profile Link */}
+          <a
+            href="https://play.anghami.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Anghami Music Profile"
+            className="inline-flex items-center justify-center p-2.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-purple-100 border border-purple-500/20 hover:border-purple-400/40 transition-all active:scale-95 shadow-[0_0_12px_rgba(168,85,247,0.15)] group"
+          >
+            <AnghamiIcon className="w-5 h-5 transition-transform group-hover:scale-110" />
+          </a>
 
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { SpotifyWidget } from '@/components/SpotifyWidget'
+import { AnghamiWidget } from '@/components/AnghamiWidget'
 
 export const StatusFooter: React.FC = () => {
   const [cairoTime, setCairoTime] = useState('')
@@ -25,8 +25,8 @@ export const StatusFooter: React.FC = () => {
   return (
     <footer className="space-y-6 pt-12 border-t border-white/5 font-mono text-xs text-zinc-400">
       
-      {/* Spotify Widget from ramx.in */}
-      <SpotifyWidget />
+      {/* Anghami Music Widget */}
+      <AnghamiWidget profileUrl="https://play.anghami.com" />
 
       {/* yust.dev Status Indicators */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 text-[11px]">
