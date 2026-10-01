@@ -38,25 +38,30 @@ export const AboutPage: React.FC = () => {
       <section className="space-y-6 pt-2 sm:pt-4">
         
         {/* Availability Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-['Chakra_Petch',sans-serif] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="tracking-wide">SYSTEM READY // FULL-STACK &amp; AI SYSTEMS ENGINEER</span>
+        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-['Chakra_Petch',sans-serif] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400"></span>
+          </span>
+          <span className="tracking-wider">SYSTEM ONLINE // FULL-STACK &amp; AI SYSTEMS ENGINEER</span>
         </div>
 
-        {/* Gaming Name Header (Orbitron) with glow */}
+        {/* Gaming Name Header (Orbitron) with chromatic holographic glow */}
         <div className="space-y-2">
-          <p className="font-['Chakra_Petch',sans-serif] text-zinc-400 text-sm sm:text-base tracking-wider uppercase">
-            Hi, I'm
+          <p className="font-['Chakra_Petch',sans-serif] text-cyan-400/80 text-sm sm:text-base tracking-wider uppercase font-semibold flex items-center gap-2">
+            <span className="w-4 h-[1px] bg-cyan-400 inline-block" />
+            <span>HELLO, WORLD. I AM</span>
           </p>
           <div className="flex flex-wrap items-baseline gap-4">
             <h1
               onClick={triggerGooseHonk}
               title="Click to unleash cyber pulse"
-              className="font-['Orbitron',sans-serif] text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white cursor-pointer select-none hover:text-cyan-400 transition-all duration-300 drop-shadow-[0_0_25px_rgba(6,182,212,0.3)] inline-block"
+              className="font-['Orbitron',sans-serif] text-5xl sm:text-7xl md:text-8xl font-black tracking-tight cursor-pointer select-none transition-all duration-300 inline-block bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(6,182,212,0.45)] hover:brightness-125"
             >
               MOSTAFA
             </h1>
-            <span className="font-['Silkscreen',monospace] text-xs sm:text-sm text-cyan-400 px-2.5 py-1 rounded-md bg-cyan-950/40 border border-cyan-500/30">
+            <span className="font-['Silkscreen',monospace] text-xs sm:text-sm text-cyan-300 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-950/60 to-indigo-950/60 border border-cyan-400/40 shadow-[0_0_15px_rgba(6,182,212,0.3)] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               LVL.24
             </span>
           </div>
@@ -65,12 +70,12 @@ export const AboutPage: React.FC = () => {
         {/* Bio Copy with LinkedIn Education */}
         <div className="space-y-3 font-mono text-sm sm:text-base text-zinc-300 leading-relaxed max-w-3xl">
           <p>
-            I'm <strong className="text-white font-bold font-['Chakra_Petch',sans-serif]">Mostafa Kamal Shabara</strong>, an AI &amp; Software Engineering student at{' '}
+            I'm <strong className="text-white font-bold font-['Chakra_Petch',sans-serif] text-base sm:text-lg">Mostafa Kamal Shabara</strong>, an AI &amp; Software Engineering student at{' '}
             <a
               href="https://horus.edu.eg"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white font-bold underline decoration-zinc-600 underline-offset-4 hover:decoration-cyan-400 hover:text-cyan-300 transition-colors"
+              className="text-cyan-300 font-bold underline decoration-cyan-500/50 underline-offset-4 hover:decoration-cyan-300 hover:text-cyan-200 transition-colors"
             >
               Horus University in Egypt (HUE)
             </a>{' '}
@@ -78,7 +83,7 @@ export const AboutPage: React.FC = () => {
           </p>
 
           <p className="text-zinc-400 text-xs sm:text-sm">
-            Architecting production web apps using <span className="text-white font-semibold">React 19, Vite, and TanStack</span>, automated LLM verification agents in <span className="text-white font-semibold">Python 3.12</span>, and hardened cloud relational databases backed by <span className="text-white font-semibold">PostgreSQL &amp; Supabase Row Level Security</span>.
+            Architecting production web apps using <span className="text-cyan-300 font-semibold">React 19, Vite, and TanStack</span>, automated LLM verification agents in <span className="text-purple-300 font-semibold">Python 3.12</span>, and hardened cloud relational databases backed by <span className="text-emerald-300 font-semibold">PostgreSQL &amp; Supabase Row Level Security</span>.
           </p>
         </div>
 
@@ -89,7 +94,7 @@ export const AboutPage: React.FC = () => {
           <button
             type="button"
             onClick={handleCopyEmail}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-zinc-950 font-bold font-['Orbitron',sans-serif] text-xs sm:text-sm transition-all duration-200 active:scale-95 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-400 hover:from-cyan-300 hover:to-teal-200 text-zinc-950 font-bold font-['Orbitron',sans-serif] text-xs sm:text-sm transition-all duration-200 active:scale-95 shadow-[0_0_25px_rgba(6,182,212,0.45)] hover:shadow-[0_0_35px_rgba(6,182,212,0.65)] hover:scale-[1.02]"
           >
             {copied ? (
               <>
@@ -108,9 +113,9 @@ export const AboutPage: React.FC = () => {
           <button
             type="button"
             onClick={handleOpenResume}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-cyan-400/40 font-['Chakra_Petch',sans-serif] font-bold text-xs sm:text-sm transition-all group"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500/15 via-purple-500/15 to-indigo-500/15 hover:bg-indigo-500/25 text-indigo-200 hover:text-white border border-indigo-500/40 hover:border-indigo-400 font-['Chakra_Petch',sans-serif] font-bold text-xs sm:text-sm transition-all group shadow-[0_0_15px_rgba(99,102,241,0.2)]"
           >
-            <UserCheck className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+            <UserCheck className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
             <span>LinkedIn CV &amp; Bio</span>
           </button>
 
@@ -120,7 +125,7 @@ export const AboutPage: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             title="LinkedIn Profile"
-            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-sky-500/10 text-white hover:text-sky-300 border border-white/10 hover:border-sky-500/30 font-mono text-xs sm:text-sm transition-colors gap-2"
+            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400 font-mono text-xs sm:text-sm transition-all gap-2 shadow-[0_0_12px_rgba(14,165,233,0.15)]"
           >
             <LinkedInIcon className="w-4 h-4 text-sky-400" />
             <span className="hidden sm:inline font-mono">LinkedIn</span>
@@ -132,7 +137,7 @@ export const AboutPage: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             title="GitHub Profile"
-            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 font-mono text-xs sm:text-sm transition-colors gap-2"
+            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 font-mono text-xs sm:text-sm transition-colors gap-2"
           >
             <GithubIcon className="w-4 h-4" />
             <span className="hidden sm:inline font-mono">GitHub</span>
@@ -185,12 +190,16 @@ export const AboutPage: React.FC = () => {
       </section>
 
       {/* Interactive Supabase Postgres Callout Banner */}
-      <section className="yust-card rounded-2xl p-6 sm:p-8 bg-gradient-to-r from-emerald-950/40 via-zinc-900 to-black border border-emerald-500/20 space-y-4">
+      <section className="yust-card rounded-2xl p-6 sm:p-8 bg-gradient-to-r from-emerald-950/50 via-[#0a1215] to-[#07080e] border border-emerald-500/30 hover:border-emerald-400/50 space-y-4 shadow-[0_0_30px_rgba(16,185,129,0.12)] transition-all">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              </span>
               <Database className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs uppercase font-['Orbitron',sans-serif] tracking-wider text-emerald-400 font-bold">
+              <span className="text-xs uppercase font-['Orbitron',sans-serif] tracking-wider text-emerald-300 font-bold">
                 Live Supabase Backend Engine
               </span>
             </div>
@@ -204,7 +213,7 @@ export const AboutPage: React.FC = () => {
 
           <Link
             to="/database"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-['Orbitron',sans-serif] font-bold text-xs sm:text-sm transition-all shadow-lg hover:scale-105 self-start sm:self-auto shrink-0"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-zinc-950 font-['Orbitron',sans-serif] font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] hover:scale-105 self-start sm:self-auto shrink-0"
           >
             <span>Launch DB Playground</span>
             <ArrowRight className="w-4 h-4" />

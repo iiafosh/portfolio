@@ -123,14 +123,18 @@ export const DatabasePage: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-300">
       
       {/* Header */}
-      <div className="border-b border-white/5 pb-4 space-y-2">
+      <div className="border-b border-white/10 pb-4 space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-zinc-400">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              </span>
               <Database className="w-4 h-4 text-emerald-400" />
-              <span className="font-mono text-xs uppercase tracking-wider text-emerald-400 font-bold">Live Supabase Database</span>
+              <span className="font-mono text-xs uppercase tracking-wider text-emerald-400 font-bold">Live Supabase Database Engine</span>
             </div>
-            <h1 className="font-['Silkscreen',monospace] text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">
+            <h1 className="font-['Silkscreen',monospace] text-2xl sm:text-3xl font-bold tracking-wide mt-1 bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(16,185,129,0.35)]">
               POSTGRESQL PLAYGROUND
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 font-mono mt-0.5">
@@ -140,18 +144,18 @@ export const DatabasePage: React.FC = () => {
 
           <button
             onClick={() => setShowSql(!showSql)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 text-xs font-mono text-zinc-300 transition-colors self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-400/40 text-xs font-mono text-zinc-300 hover:text-emerald-300 transition-colors self-start sm:self-auto"
           >
-            <Code2 className="w-3.5 h-3.5 text-indigo-400" />
+            <Code2 className="w-3.5 h-3.5 text-emerald-400" />
             <span>{showSql ? 'Hide SQL' : 'View RLS Policy'}</span>
           </button>
         </div>
 
         {/* Expandable SQL */}
         {showSql && (
-          <div className="pt-3 border-t border-white/5 text-xs font-mono space-y-1">
-            <span className="text-[11px] text-indigo-300 block">Row Level Security Policy on public.user_items:</span>
-            <pre className="p-3 rounded-xl bg-black/60 text-zinc-300 text-[11px] overflow-x-auto leading-relaxed border border-white/5">
+          <div className="pt-3 border-t border-white/10 text-xs font-mono space-y-1">
+            <span className="text-[11px] text-emerald-300 block">Row Level Security Policy on public.user_items:</span>
+            <pre className="p-3 rounded-xl bg-black/80 text-emerald-300 text-[11px] overflow-x-auto leading-relaxed border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
 {`create policy "Users can read own items"
   on public.user_items for select
   to authenticated
@@ -162,23 +166,23 @@ export const DatabasePage: React.FC = () => {
       </div>
 
       {/* Main Container */}
-      <div className="yust-card rounded-2xl p-6 sm:p-8 space-y-6">
+      <div className="yust-card rounded-2xl p-6 sm:p-8 space-y-6 border border-emerald-500/20 bg-gradient-to-b from-[#0a1518]/90 via-[#070e12]/95 to-[#07080e] shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_30px_rgba(16,185,129,0.1)]">
         {user ? (
           /* Logged In View */
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-black/40 border border-white/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-black/60 border border-emerald-500/20">
               <div className="flex items-center gap-3">
                 <img
                   src={user.user_metadata?.avatar_url || 'https://avatars.githubusercontent.com/u/256016032?v=4'}
                   alt="Avatar"
-                  className="w-10 h-10 rounded-xl object-cover border border-white/10"
+                  className="w-10 h-10 rounded-xl object-cover border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
                 />
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-white">
                       {user.user_metadata?.full_name || user.user_metadata?.user_name || 'Authenticated User'}
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono font-bold">
                       Session Verified
                     </span>
                   </div>
@@ -191,9 +195,9 @@ export const DatabasePage: React.FC = () => {
               <button
                 onClick={() => refetch()}
                 disabled={isFetching}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 hover:border-zinc-700 text-xs text-zinc-300 font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-emerald-500/20 hover:border-emerald-500/40 text-xs text-zinc-300 hover:text-emerald-300 font-medium transition-colors"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-indigo-400' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-emerald-400' : ''}`} />
                 <span>Sync Cache</span>
               </button>
             </div>
@@ -206,12 +210,12 @@ export const DatabasePage: React.FC = () => {
                 placeholder="Insert a live record into Supabase PostgreSQL..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="flex-1 bg-black/60 border border-white/10 focus:border-white/30 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-zinc-500 outline-none transition-colors"
+                className="flex-1 bg-black/80 border border-white/10 focus:border-emerald-400/50 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-zinc-500 outline-none transition-colors"
               />
               <button
                 type="submit"
                 disabled={addItemMutation.isPending || !title.trim()}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-zinc-950 font-bold text-xs sm:text-sm hover:bg-zinc-200 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-zinc-950 font-['Orbitron',sans-serif] font-bold text-xs sm:text-sm transition-all shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] active:scale-95"
               >
                 {addItemMutation.isPending ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -291,22 +295,22 @@ export const DatabasePage: React.FC = () => {
         ) : (
           /* Guest View */
           <div className="text-center py-8 space-y-4 max-w-md mx-auto">
-            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-zinc-300 shadow-md">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-300 shadow-[0_0_25px_rgba(16,185,129,0.25)]">
               <Lock className="w-6 h-6" />
             </div>
 
             <div className="space-y-1.5">
-              <h3 className="text-lg font-bold text-white tracking-tight">
+              <h3 className="text-lg font-bold font-['Chakra_Petch',sans-serif] text-white tracking-tight">
                 Live Supabase Authentication
               </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-zinc-400 leading-relaxed font-mono">
                 Click below to sign in with GitHub via Supabase OAuth. Once verified, you will have your own isolated Row Level Security workspace to insert and manage live records!
               </p>
             </div>
 
             <button
               onClick={signInWithGithub}
-              className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs sm:text-sm transition-all shadow-lg hover:scale-105"
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-zinc-950 font-['Orbitron',sans-serif] font-bold text-xs sm:text-sm transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:shadow-[0_0_35px_rgba(16,185,129,0.6)] hover:scale-105 active:scale-95"
             >
               <GithubIcon className="w-4 h-4" />
               <span>Sign in with GitHub to Test Live</span>

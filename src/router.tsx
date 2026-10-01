@@ -15,13 +15,28 @@ import { NotFound } from '@/pages/NotFound'
 
 import { StatusFooter } from '@/components/StatusFooter'
 
-// Root layout with exact yust.dev style floating dock, noise texture, and focused container
+// Root layout with exact yust.dev style floating dock, ambient glows, noise texture, and focused container
 const rootRoute = createRootRoute({
   component: () => (
-    <div className="min-h-screen bg-[#0c0c0c] text-zinc-300 font-sans antialiased relative selection:bg-white/10 selection:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#07080e] text-zinc-300 font-sans antialiased relative selection:bg-cyan-500/20 selection:text-cyan-200 flex flex-col justify-between overflow-x-hidden">
       
+      {/* Ambient chromatic light spotlights */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        {/* Top-center electric cyan spotlight */}
+        <div className="absolute -top-[15%] left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-cyan-500/15 blur-[130px] rounded-full pointer-events-none" />
+        {/* Top-right cyber violet spotlight */}
+        <div className="absolute top-[10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/12 blur-[150px] rounded-full pointer-events-none" />
+        {/* Mid-left neon emerald spotlight */}
+        <div className="absolute top-[45%] left-[-15%] w-[450px] h-[450px] bg-emerald-500/10 blur-[140px] rounded-full pointer-events-none" />
+        {/* Bottom-right amber warm glow */}
+        <div className="absolute bottom-[5%] right-[-5%] w-[400px] h-[400px] bg-amber-500/8 blur-[140px] rounded-full pointer-events-none" />
+      </div>
+
+      {/* Cyber Grid Pattern Overlay */}
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_75%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+
       {/* Background noise texture */}
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.015]">
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.025]">
         <svg className="w-full h-full">
           <filter id="noise">
             <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="2" stitchTiles="stitch" />
@@ -30,7 +45,7 @@ const rootRoute = createRootRoute({
         </svg>
       </div>
 
-      {/* yust.dev Floating Metallic Pill Dock */}
+      {/* Floating Metallic Pill Dock */}
       <Dock />
 
       {/* Main Page Container */}

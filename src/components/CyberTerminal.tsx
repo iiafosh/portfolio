@@ -163,14 +163,14 @@ export const CyberTerminal: React.FC = () => {
   ]
 
   return (
-    <div className="yust-card rounded-2xl p-5 sm:p-7 space-y-4 relative overflow-hidden border border-white/10 bg-black/80 font-mono">
+    <div className="yust-card rounded-2xl p-5 sm:p-7 space-y-4 relative overflow-hidden border border-cyan-500/30 bg-[#080c16]/95 font-mono shadow-[0_12px_40px_rgba(0,0,0,0.7),0_0_30px_rgba(6,182,212,0.12)]">
       
       {/* Matrix Background Effect */}
       {matrixActive && (
-        <div className="pointer-events-none absolute inset-0 opacity-15 overflow-hidden font-mono text-[10px] text-emerald-400 leading-none select-none z-0">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className="animate-[pulse_1.5s_infinite] whitespace-nowrap">
-              01010110 01101001 01110100 01100101 00100000 01010100 01100001 01101110 01010011 01110100 01100001 01100011 01101011 00100000 01010011 01110101 01110000 01100001 01100010 01100001 01110011 01100101
+        <div className="pointer-events-none absolute inset-0 opacity-20 overflow-hidden font-mono text-[10px] text-emerald-400 leading-none select-none z-0">
+          {Array.from({ length: 22 }).map((_, i) => (
+            <div key={i} className="animate-[pulse_1.2s_infinite] whitespace-nowrap text-emerald-300 font-bold">
+              01010110 01101001 01110100 01100101 00100000 01010100 01100001 01101110 01010011 01110100 01100001 01100011 01101011 00100000 01010011 01110101 01110000 01100001 01100010 01100001 01100011 01100101
             </div>
           ))}
         </div>
@@ -179,20 +179,20 @@ export const CyberTerminal: React.FC = () => {
       {/* Terminal Title Bar */}
       <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.7)]" />
+            <span className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.7)]" />
+            <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
           </div>
-          <span className="text-xs font-['Orbitron',sans-serif] text-zinc-400 ml-2 font-bold flex items-center gap-1.5">
+          <span className="text-xs font-['Orbitron',sans-serif] text-cyan-300 ml-2 font-bold flex items-center gap-1.5">
             <Terminal className="w-3.5 h-3.5 text-cyan-400" />
             <span>SHOWCASE // CYBER TERMINAL</span>
           </span>
         </div>
 
-        <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+        <span className="text-[10px] text-emerald-400 font-mono font-bold flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-          LIVE INTERACTIVE
+          LIVE SHELL
         </span>
       </div>
 
@@ -203,7 +203,7 @@ export const CyberTerminal: React.FC = () => {
             key={qc.cmd}
             type="button"
             onClick={() => executeCommand(qc.cmd)}
-            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-[11px] text-zinc-300 hover:text-cyan-300 border border-white/10 hover:border-cyan-500/40 transition-all font-mono active:scale-95"
+            className="px-2.5 py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-500/20 text-[11px] text-cyan-300 hover:text-white border border-cyan-500/30 hover:border-cyan-400 transition-all font-mono active:scale-95 shadow-[0_0_8px_rgba(6,182,212,0.12)]"
           >
             {qc.label}
           </button>
@@ -218,7 +218,7 @@ export const CyberTerminal: React.FC = () => {
               <span className="text-cyan-400 font-bold">mostafa@cyberdeck:~$</span>
               <span className="text-white font-semibold">{h.command}</span>
             </div>
-            <div className="pl-3 border-l border-white/10 text-xs">
+            <div className="pl-3 border-l border-cyan-500/30 text-xs">
               {h.output}
             </div>
           </div>
@@ -236,11 +236,11 @@ export const CyberTerminal: React.FC = () => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type command (e.g. skills, matrix, projects, sudo hire)..."
-          className="flex-1 bg-transparent text-xs text-white placeholder-zinc-600 outline-none font-mono"
+          className="flex-1 bg-transparent text-xs text-white placeholder-zinc-500 outline-none font-mono"
         />
         <button
           type="submit"
-          className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="p-1.5 rounded-lg text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-colors"
           title="Send command"
         >
           <CornerDownLeft className="w-3.5 h-3.5" />
