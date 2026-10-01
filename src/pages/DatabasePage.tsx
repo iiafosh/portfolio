@@ -123,17 +123,17 @@ export const DatabasePage: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-300">
       
       {/* Header */}
-      <div className="yust-card rounded-2xl p-6 sm:p-7 space-y-2">
+      <div className="border-b border-white/5 pb-4 space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-zinc-400">
               <Database className="w-4 h-4 text-emerald-400" />
-              <span className="font-mono text-[11px] uppercase tracking-wider">Live Backend</span>
+              <span className="font-mono text-xs uppercase tracking-wider text-emerald-400 font-bold">Live Supabase Database</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-1">
-              Supabase PostgreSQL Playground
+            <h1 className="font-['Silkscreen',monospace] text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">
+              POSTGRESQL PLAYGROUND
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-0.5">
+            <p className="text-xs sm:text-sm text-zinc-400 font-mono mt-0.5">
               Live CRUD operations and optimistic caching backed by Postgres Row Level Security.
             </p>
           </div>

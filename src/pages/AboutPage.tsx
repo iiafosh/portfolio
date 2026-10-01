@@ -1,201 +1,171 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { MapPin, Mail, Check, Clock, ArrowRight, GraduationCap, ShieldCheck } from 'lucide-react'
+import { Mail, Check, FileText, ArrowRight, Database } from 'lucide-react'
 import { GithubIcon } from '@/components/icons/GithubIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
+import { GitHubActivity } from '@/components/GitHubActivity'
+import { SelectedOutcomes } from '@/components/SelectedOutcomes'
+import { BentoProjects } from '@/components/BentoProjects'
+import { GearsAndSetup } from '@/components/GearsAndSetup'
+import { triggerGooseHonk } from '@/utils/gooseEasterEgg'
 
 export const AboutPage: React.FC = () => {
   const [copied, setCopied] = useState(false)
-  const [cairoTime, setCairoTime] = useState('')
   const email = '8251677@horus.edu.eg'
 
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date()
-      const timeStr = now.toLocaleTimeString('en-US', {
-        timeZone: 'Africa/Cairo',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      })
-      setCairoTime(timeStr)
-    }
-    updateTime()
-    const interval = setInterval(updateTime, 1000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const handleCopyEmail = () => {
+  const handleCopyEmail = (e: React.MouseEvent) => {
     navigator.clipboard.writeText(email)
     setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    triggerGooseHonk(e)
+    setTimeout(() => setCopied(false), 2200)
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-12 sm:space-y-16 animate-in fade-in duration-300">
       
-      {/* Hero Card */}
-      <div className="yust-card rounded-2xl p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-400">
-                Available for Roles &amp; Contracts
-              </span>
-            </div>
-            
-            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Mostafa Shabara
-            </h1>
-            <p className="text-sm font-mono text-zinc-400">
-              Full-Stack &amp; AI Developer &bull; Egypt 🇪🇬
-            </p>
-          </div>
-
-          <div className="relative group self-start sm:self-auto">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl p-[1px] bg-gradient-to-tr from-white/20 via-white/5 to-white/10 shadow-xl">
-              <img
-                src="https://avatars.githubusercontent.com/u/256016032?v=4"
-                alt="Mostafa Shabara"
-                className="w-full h-full rounded-[15px] object-cover bg-black"
-              />
-            </div>
-            <span className="absolute -bottom-1 -right-1 bg-[#18181c] border border-white/10 rounded-full px-1.5 py-0.5 text-[9px] font-mono text-zinc-300 flex items-center gap-0.5">
-              <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
-              HUE
-            </span>
-          </div>
+      {/* Hero Header */}
+      <section className="space-y-6 pt-2 sm:pt-4">
+        
+        {/* Availability Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Available for High-Impact Software Engineering Roles</span>
         </div>
 
-        <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-          Computer Science &amp; Artificial Intelligence student at <strong className="text-white font-medium">Horus University in Egypt (HUE)</strong>. Building modern web platforms using <strong className="text-white font-medium">Vite</strong>, <strong className="text-white font-medium">TanStack Router &amp; Query</strong>, and cloud databases with <strong className="text-white font-medium">Supabase PostgreSQL</strong> and Row Level Security.
-        </p>
+        {/* Name Header with Pixel Font from yust.dev */}
+        <div className="space-y-2">
+          <p className="font-mono text-zinc-400 text-sm sm:text-base">Hi I'm 👋</p>
+          <h1
+            onClick={triggerGooseHonk}
+            title="Click for surprise"
+            className="font-['Silkscreen',monospace] text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white cursor-pointer select-none hover:text-emerald-400 transition-colors inline-block"
+          >
+            MOSTAFA
+          </h1>
+        </div>
 
-        {/* Quick Social & Contact Bar */}
-        <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-white/5">
+        {/* Bio Copy */}
+        <div className="space-y-3 font-mono text-sm sm:text-base text-zinc-400 leading-relaxed max-w-3xl">
+          <p>
+            I'm <strong className="text-white font-bold">Mostafa Kamal Shabara</strong>, an AI &amp; Software Engineering student at{' '}
+            <a
+              href="https://horus.edu.eg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white font-bold underline decoration-zinc-600 underline-offset-4 hover:decoration-emerald-400 transition-colors"
+            >
+              Horus University in Egypt
+            </a>{' '}
+            and a full-stack engineer building production tools that scale.
+          </p>
+
+          <p>
+            Specializing in high-velocity web platforms using <span className="text-zinc-200">React, TypeScript, Vite, and TanStack</span>, autonomous agent workflows in <span className="text-zinc-200">Python 3.12</span>, and hardened relational data architectures backed by <span className="text-zinc-200">PostgreSQL and Supabase Row Level Security</span>.
+          </p>
+        </div>
+
+        {/* Action Buttons from yust.dev & aryankarma */}
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2">
+          <button
+            type="button"
+            onClick={handleCopyEmail}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold font-mono text-xs sm:text-sm transition-all duration-200 active:scale-95 shadow-lg"
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>Copied Email!</span>
+              </>
+            ) : (
+              <>
+                <Mail className="w-4 h-4 text-zinc-900" />
+                <span>Copy My Email</span>
+              </>
+            )}
+          </button>
+
           <a
             href="https://github.com/iiafosh"
             target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white font-medium transition-all"
+            rel="noopener noreferrer"
+            title="GitHub Profile"
+            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 font-mono text-xs sm:text-sm transition-colors gap-2"
           >
-            <GithubIcon className="w-3.5 h-3.5" />
-            <span>GitHub</span>
+            <GithubIcon className="w-4 h-4" />
+            <span className="hidden sm:inline">GitHub</span>
           </a>
 
           <a
             href="https://www.linkedin.com/in/mostafa-kamal-3731453a9/"
             target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white font-medium transition-all"
+            rel="noopener noreferrer"
+            title="LinkedIn Profile"
+            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/10 font-mono text-xs sm:text-sm transition-colors gap-2"
           >
-            <LinkedInIcon className="w-3.5 h-3.5 text-sky-400" />
-            <span>LinkedIn</span>
+            <LinkedInIcon className="w-4 h-4" />
+            <span className="hidden sm:inline">LinkedIn</span>
           </a>
 
-          <button
-            onClick={handleCopyEmail}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-zinc-300 font-mono transition-all"
+          <a
+            href="https://github.com/iiafosh/portfolio"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 font-mono text-xs sm:text-sm transition-colors gap-2"
           >
-            {copied ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Mail className="w-3.5 h-3.5 text-zinc-400" />
-                <span>{email}</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Highlights Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
-        
-        {/* Education Tile */}
-        <div className="yust-card rounded-2xl p-4 sm:p-5 space-y-2">
-          <div className="flex items-center gap-2 text-zinc-400">
-            <GraduationCap className="w-4 h-4 text-indigo-400" />
-            <span className="font-mono text-[11px] uppercase tracking-wider">Education</span>
-          </div>
-          <h3 className="font-semibold text-white text-sm">Horus University in Egypt</h3>
-          <p className="text-zinc-400 text-xs leading-relaxed">
-            B.Sc. in Computer Science &amp; Artificial Intelligence (2023 - 2027). Specializing in software engineering, database systems, and ML.
-          </p>
+            <FileText className="w-4 h-4" />
+            <span className="hidden sm:inline">Source Code</span>
+          </a>
         </div>
 
-        {/* Live Clock & Location */}
-        <div className="yust-card rounded-2xl p-4 sm:p-5 space-y-2">
-          <div className="flex items-center justify-between text-zinc-400">
+      </section>
+
+      {/* GitHub Velocity Graph (aryankarma) */}
+      <section>
+        <GitHubActivity />
+      </section>
+
+      {/* Selected Outcomes (yust.dev) */}
+      <section>
+        <SelectedOutcomes />
+      </section>
+
+      {/* Bento Grid Projects (yust.dev & aryankarma) */}
+      <section id="projects">
+        <BentoProjects />
+      </section>
+
+      {/* Interactive Supabase Postgres Callout Banner */}
+      <section className="yust-card rounded-2xl p-6 sm:p-8 bg-gradient-to-r from-emerald-950/40 via-zinc-900 to-black border border-emerald-500/20 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-400" />
-              <span className="font-mono text-[11px] uppercase tracking-wider">Cairo Time</span>
+              <Database className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs uppercase font-mono tracking-wider text-emerald-400 font-bold">
+                Live Supabase Backend Playground
+              </span>
             </div>
-            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-              Online
-            </span>
+            <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+              Test Live PostgreSQL CRUD &amp; GitHub Auth
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-400 font-mono">
+              Try our live database console with Row Level Security (RLS) and optimistic cache mutations.
+            </p>
           </div>
-          <div className="text-2xl font-mono font-bold text-white tracking-tight">
-            {cairoTime || '02:00 AM'}
-          </div>
-          <p className="text-zinc-400 text-xs flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-zinc-500" />
-            <span>Damietta, Egypt (GMT+3) &bull; Remote Available</span>
-          </p>
+
+          <Link
+            to="/database"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-mono font-bold text-xs sm:text-sm transition-all shadow-lg hover:scale-105 self-start sm:self-auto shrink-0"
+          >
+            <span>Launch DB Playground</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
+      </section>
 
-      </div>
-
-      {/* Tech Stack Pills (Minimalist yust.dev / ramx.in style) */}
-      <div className="yust-card rounded-2xl p-5 space-y-3">
-        <div className="flex items-center justify-between text-xs text-zinc-400 border-b border-white/5 pb-2">
-          <span className="font-mono text-[11px] uppercase tracking-wider">Primary Stack</span>
-          <span className="font-mono text-[11px] text-zinc-500">2026 Production</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {['React 19', 'TypeScript', 'Vite 6', 'TanStack Router', 'TanStack Query', 'Supabase Postgres', 'Row Level Security', 'Tailwind CSS', 'Python', 'Vercel Edge'].map((item) => (
-            <span
-              key={item}
-              className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/10 text-zinc-300 font-mono text-[11px]"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Navigation Quick Links */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
-        <Link
-          to="/projects"
-          className="yust-card rounded-2xl p-4 sm:p-5 flex items-center justify-between group hover:bg-white/[0.02] transition-colors"
-        >
-          <div>
-            <h4 className="font-semibold text-white text-sm group-hover:text-indigo-300 transition-colors">
-              Explore Projects &rarr;
-            </h4>
-            <p className="text-xs text-zinc-400 mt-0.5">Full-stack applications &amp; open source code</p>
-          </div>
-          <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-white transition-all group-hover:translate-x-1" />
-        </Link>
-
-        <Link
-          to="/database"
-          className="yust-card rounded-2xl p-4 sm:p-5 flex items-center justify-between group hover:bg-white/[0.02] transition-colors"
-        >
-          <div>
-            <h4 className="font-semibold text-white text-sm group-hover:text-emerald-300 transition-colors">
-              Live Supabase Playground &rarr;
-            </h4>
-            <p className="text-xs text-zinc-400 mt-0.5">Test real-time Postgres CRUD with GitHub OAuth</p>
-          </div>
-          <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-white transition-all group-hover:translate-x-1" />
-        </Link>
-      </div>
+      {/* Gears & Tools (ramx.in) */}
+      <section id="gears">
+        <GearsAndSetup />
+      </section>
 
     </div>
   )

@@ -13,6 +13,8 @@ import { DatabasePage } from '@/pages/DatabasePage'
 import { AuthCallback } from '@/pages/AuthCallback'
 import { NotFound } from '@/pages/NotFound'
 
+import { StatusFooter } from '@/components/StatusFooter'
+
 // Root layout with exact yust.dev style floating dock, noise texture, and focused container
 const rootRoute = createRootRoute({
   component: () => (
@@ -28,19 +30,14 @@ const rootRoute = createRootRoute({
         </svg>
       </div>
 
-      {/* yust.dev Floating Pill Dock */}
+      {/* yust.dev Floating Metallic Pill Dock */}
       <Dock />
 
       {/* Main Page Container */}
-      <main className="relative z-10 w-full max-w-2xl mx-auto px-4 pt-8 sm:pt-28 pb-24 sm:pb-16 flex-1">
+      <main className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-28 pb-20 flex-1">
         <Outlet />
+        <StatusFooter />
       </main>
-
-      {/* Minimalist yust.dev style footer */}
-      <footer className="relative z-10 w-full max-w-2xl mx-auto px-4 pb-8 pt-4 text-center text-xs text-zinc-600 font-mono flex items-center justify-between border-t border-white/5">
-        <span>Mostafa Shabara &bull; HUE</span>
-        <span>&copy; {new Date().getFullYear()}</span>
-      </footer>
 
     </div>
   ),
