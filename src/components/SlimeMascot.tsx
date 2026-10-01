@@ -1,267 +1,295 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { triggerSlimeBloop } from '@/utils/slimeEasterEgg'
+import rimuruSlimeImg from '@/assets/rimuru-slime.png'
 
 const QUOTES = [
-  'bloop!',
-  'LVL.24 Companion ( •̀ ω •́ )✧',
-  'ready for quests!',
-  'boing boing~',
-  'hi Mostafa!',
-  'cyber slime online 💧',
-  'full-stack buddy!',
-  'super jelly pulse!',
+  "I'm not a bad slime, slurp! (Rimuru)",
+  'Great Sage: All systems nominal.',
+  'I wrote this in Python 3.12 🐍',
+  'hire Mostafa pls! (≧◡≦)',
+  'Predator skill: analyzing GitHub commits...',
+  'git push --force (no regrets)',
+  'null === undefined ...right?',
+  'Verdict.run: 120k+ impressions!',
+  "rm -rf /node_modules: it's a feature",
+  'boing boing~ 💧',
+  'Level 24 Full-Stack AI Engineer!',
 ]
 
+type MascotState = 'idle' | 'hopping' | 'visiting_cursor' | 'dragged'
+
 export const SlimeMascot: React.FC = () => {
-  // Target position (where cursor is)
-  const targetPos = useRef<{ x: number; y: number }>({
-    x: typeof window !== 'undefined' ? window.innerWidth - 90 : 200,
-    y: typeof window !== 'undefined' ? window.innerHeight - 140 : 200,
+  // Whether the desktop mascot is released (active)
+  const [isReleased, setIsReleased] = useState(true)
+
+  // Position state on screen
+  const posRef = useRef<{ x: number; y: number }>({
+    x: typeof window !== 'undefined' ? Math.max(100, window.innerWidth - 180) : 300,
+    y: typeof window !== 'undefined' ? Math.max(150, window.innerHeight - 200) : 300,
   })
 
-  // Current smooth interpolated position
-  const currentPos = useRef<{ x: number; y: number }>({
-    x: typeof window !== 'undefined' ? window.innerWidth - 90 : 200,
-    y: typeof window !== 'undefined' ? window.innerHeight - 140 : 200,
+  // Target roaming destination
+  const targetRef = useRef<{ x: number; y: number }>({
+    x: typeof window !== 'undefined' ? Math.max(100, window.innerWidth - 180) : 300,
+    y: typeof window !== 'undefined' ? Math.max(150, window.innerHeight - 200) : 300,
   })
 
+  // Cursor position tracking for curiosity visits
+  const mousePosRef = useRef<{ x: number; y: number }>({ x: 300, y: 300 })
+  const lastMouseMoveTime = useRef<number>(Date.now())
+
+  // Visual state
+  const [facingRight, setFacingRight] = useState(false)
   const [speech, setSpeech] = useState<string | null>(null)
-  const [isBlinking, setIsBlinking] = useState(false)
   const [isHappy, setIsHappy] = useState(false)
-  const [isJumping, setIsJumping] = useState(false)
-  const [hasMouseMoved, setHasMouseMoved] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
-  const slimeRef = useRef<HTMLDivElement>(null)
+  const mascotRef = useRef<HTMLDivElement>(null)
+  const stateRef = useRef<MascotState>('idle')
+  const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const blinkTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const nextActionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Track mouse coordinates
+  // Track cursor position without gluing the mascot to it
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Slime trails smoothly slightly to bottom-right of cursor (+28px x, +28px y)
-      // so it never obstructs clicking links or text
-      targetPos.current = {
-        x: Math.min(window.innerWidth - 50, Math.max(20, e.clientX + 28)),
-        y: Math.min(window.innerHeight - 50, Math.max(20, e.clientY + 24)),
-      }
-      if (!hasMouseMoved) setHasMouseMoved(true)
+      mousePosRef.current = { x: e.clientX, y: e.clientY }
+      lastMouseMoveTime.current = Date.now()
     }
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches[0]) {
-        targetPos.current = {
-          x: Math.min(window.innerWidth - 50, Math.max(20, e.touches[0].clientX + 24)),
-          y: Math.min(window.innerHeight - 50, Math.max(20, e.touches[0].clientY + 24)),
-        }
-        if (!hasMouseMoved) setHasMouseMoved(true)
-      }
-    }
-
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
-    window.addEventListener('touchmove', handleTouchMove, { passive: true })
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('touchmove', handleTouchMove)
-    }
-  }, [hasMouseMoved])
-
-  // Periodic natural Kawaii blinking
-  useEffect(() => {
-    const triggerBlink = () => {
-      setIsBlinking(true)
-      setTimeout(() => setIsBlinking(false), 160)
-
-      const nextBlink = Math.random() * 3500 + 2500
-      blinkTimeoutRef.current = setTimeout(triggerBlink, nextBlink)
-    }
-
-    blinkTimeoutRef.current = setTimeout(triggerBlink, 3000)
-    return () => {
-      if (blinkTimeoutRef.current) clearTimeout(blinkTimeoutRef.current)
-    }
+    return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  // Listen for celebratory jumps triggered externally (e.g. from dock or terminal)
-  const performJump = useCallback(() => {
-    setIsJumping(true)
-    setIsHappy(true)
-    const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)]
-    setSpeech(quote)
-
+  // Show a quote in speech bubble
+  const showSpeech = useCallback((text?: string) => {
+    const chosen = text || QUOTES[Math.floor(Math.random() * QUOTES.length)]
+    setSpeech(chosen)
     if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current)
     speechTimeoutRef.current = setTimeout(() => {
       setSpeech(null)
-      setIsHappy(false)
-    }, 2400)
-
-    setTimeout(() => setIsJumping(false), 600)
+    }, 3200)
   }, [])
 
-  useEffect(() => {
-    const handleJumpEvent = () => performJump()
-    window.addEventListener('slime-mascot-jump', handleJumpEvent)
-    return () => window.removeEventListener('slime-mascot-jump', handleJumpEvent)
-  }, [performJump])
+  // Autonomous decision maker (like Desktop Goose in yust.dev)
+  const scheduleNextAction = useCallback(() => {
+    if (nextActionTimeoutRef.current) clearTimeout(nextActionTimeoutRef.current)
+    if (!isReleased || stateRef.current === 'dragged') return
 
-  // Physics animation loop using requestAnimationFrame
-  useEffect(() => {
-    let animId: number
-    let prevX = currentPos.current.x
-    let prevY = currentPos.current.y
-    let time = 0
+    // Decide what to do after an idle pause
+    const idleDuration = Math.random() * 2500 + 2000
 
-    const updatePhysics = () => {
-      time += 0.05
+    nextActionTimeoutRef.current = setTimeout(() => {
+      if (!isReleased || stateRef.current === 'dragged') return
 
-      // Smooth spring lerp towards target
-      const lerp = 0.12
-      currentPos.current.x += (targetPos.current.x - currentPos.current.x) * lerp
-      currentPos.current.y += (targetPos.current.y - currentPos.current.y) * lerp
+      const roll = Math.random()
+      const w = window.innerWidth
+      const h = window.innerHeight
 
-      // Calculate movement velocity
-      const vx = currentPos.current.x - prevX
-      const vy = currentPos.current.y - prevY
-      const speed = Math.hypot(vx, vy)
-      prevX = currentPos.current.x
-      prevY = currentPos.current.y
-
-      if (slimeRef.current) {
-        // Idle gentle breathing
-        const idleBreathing = Math.sin(time) * 0.04
-        
-        // Dynamic squish & stretch based on movement speed
-        const speedStretch = Math.min(speed * 0.02, 0.28)
-        const scaleX = 1 - speedStretch + idleBreathing
-        const scaleY = 1 + speedStretch - idleBreathing
-
-        // Slight tilt in direction of motion
-        const tilt = Math.max(-25, Math.min(25, vx * 1.5))
-
-        slimeRef.current.style.transform = `translate3d(${currentPos.current.x}px, ${currentPos.current.y}px, 0) rotate(${tilt}deg) scale(${scaleX}, ${scaleY})`
+      // 30% chance to curiously wander over near cursor
+      if (roll < 0.35 && Date.now() - lastMouseMoveTime.current < 8000) {
+        stateRef.current = 'visiting_cursor'
+        // Target a position ~80px away from the cursor
+        const angle = Math.random() * Math.PI * 2
+        const dist = 75 + Math.random() * 40
+        targetRef.current = {
+          x: Math.max(50, Math.min(w - 120, mousePosRef.current.x + Math.cos(angle) * dist)),
+          y: Math.max(80, Math.min(h - 100, mousePosRef.current.y + Math.sin(angle) * dist)),
+        }
+      } else {
+        // Wandering to a random location on screen
+        stateRef.current = 'hopping'
+        targetRef.current = {
+          x: Math.max(60, Math.min(w - 130, Math.random() * (w - 180) + 90)),
+          y: Math.max(90, Math.min(h - 110, Math.random() * (h - 220) + 110)),
+        }
       }
 
-      animId = requestAnimationFrame(updatePhysics)
+      setFacingRight(targetRef.current.x > posRef.current.x)
+    }, idleDuration)
+  }, [isReleased])
+
+  // Listen for duck dock button click to toggle / celebrate mascot
+  useEffect(() => {
+    const handleReleaseToggle = () => {
+      if (!isReleased) {
+        setIsReleased(true)
+        showSpeech("Rimuru has arrived! 💧")
+        triggerSlimeBloop()
+      } else {
+        // Joyful jump & quote
+        setIsHappy(true)
+        showSpeech()
+        setTimeout(() => setIsHappy(false), 800)
+      }
     }
 
-    animId = requestAnimationFrame(updatePhysics)
-    return () => cancelAnimationFrame(animId)
-  }, [])
+    window.addEventListener('slime-mascot-jump', handleReleaseToggle)
+    return () => window.removeEventListener('slime-mascot-jump', handleReleaseToggle)
+  }, [isReleased, showSpeech])
 
-  // Interaction when clicked / petted
-  const handlePetSlime = (e: React.MouseEvent) => {
+  // Mascot physics & animation loop (60fps requestAnimationFrame)
+  useEffect(() => {
+    if (!isReleased) return
+
+    let animId: number
+    let hopPhase = 0
+    let time = 0
+
+    const updateLoop = () => {
+      time += 0.04
+
+      if (stateRef.current !== 'dragged') {
+        const dx = targetRef.current.x - posRef.current.x
+        const dy = targetRef.current.y - posRef.current.y
+        const dist = Math.hypot(dx, dy)
+
+        if (dist > 8 && (stateRef.current === 'hopping' || stateRef.current === 'visiting_cursor')) {
+          // Hop motion physics: advances in small rhythm bounces
+          hopPhase += 0.14
+          const hopHeight = Math.max(0, Math.sin(hopPhase)) * 18
+          const hopSpeed = 3.2
+
+          posRef.current.x += (dx / dist) * hopSpeed
+          posRef.current.y += (dy / dist) * hopSpeed
+
+          // Squash & stretch on hop
+          const bounceScaleY = 1 + (Math.sin(hopPhase) * 0.22)
+          const bounceScaleX = 1 - (Math.sin(hopPhase) * 0.15)
+          const flip = facingRight ? -1 : 1
+
+          if (mascotRef.current) {
+            mascotRef.current.style.transform = `translate3d(${posRef.current.x}px, ${posRef.current.y - hopHeight}px, 0) scale(${flip * bounceScaleX}, ${bounceScaleY})`
+          }
+        } else {
+          // Reached destination -> switch to idle
+          if (stateRef.current !== 'idle') {
+            const prevState = stateRef.current
+            stateRef.current = 'idle'
+            hopPhase = 0
+
+            // If it just visited the cursor, say something cute
+            if (prevState === 'visiting_cursor') {
+              showSpeech()
+            }
+
+            scheduleNextAction()
+          }
+
+          // Gentle idle breathing
+          const breatheY = 1 + Math.sin(time * 2.5) * 0.04
+          const breatheX = 1 - Math.sin(time * 2.5) * 0.03
+          const flip = facingRight ? -1 : 1
+
+          if (mascotRef.current) {
+            mascotRef.current.style.transform = `translate3d(${posRef.current.x}px, ${posRef.current.y}px, 0) scale(${flip * breatheX}, ${breatheY})`
+          }
+        }
+      }
+
+      animId = requestAnimationFrame(updateLoop)
+    }
+
+    animId = requestAnimationFrame(updateLoop)
+    scheduleNextAction()
+
+    return () => {
+      cancelAnimationFrame(animId)
+      if (nextActionTimeoutRef.current) clearTimeout(nextActionTimeoutRef.current)
+    }
+  }, [isReleased, facingRight, scheduleNextAction, showSpeech])
+
+  // Mouse Dragging (pick up Rimuru and toss him anywhere!)
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation()
+    setIsDragging(true)
+    stateRef.current = 'dragged'
+    dragOffsetRef.current = {
+      x: e.clientX - posRef.current.x,
+      y: e.clientY - posRef.current.y,
+    }
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging) return
+    posRef.current.x = Math.max(30, Math.min(window.innerWidth - 90, e.clientX - dragOffsetRef.current.x))
+    posRef.current.y = Math.max(60, Math.min(window.innerHeight - 80, e.clientY - dragOffsetRef.current.y))
+
+    if (mascotRef.current) {
+      // Elastic jelly stretch when dragged
+      mascotRef.current.style.transform = `translate3d(${posRef.current.x}px, ${posRef.current.y}px, 0) scale(1.15, 0.85)`
+    }
+  }
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDragging) return
+    setIsDragging(false)
+    stateRef.current = 'idle'
+    targetRef.current = { ...posRef.current }
+    triggerSlimeBloop(e)
+    showSpeech("boing! (≧◡≦)")
+    scheduleNextAction()
+  }
+
+  // Click / poke directly
+  const handlePoke = (e: React.MouseEvent) => {
     e.stopPropagation()
     triggerSlimeBloop(e)
-    performJump()
+    setIsHappy(true)
+    showSpeech()
+    setTimeout(() => setIsHappy(false), 900)
   }
+
+  if (!isReleased) return null
 
   return (
     <div
-      ref={slimeRef}
-      onClick={handlePetSlime}
-      className={`fixed top-0 left-0 z-[9999] pointer-events-auto cursor-pointer select-none -translate-x-1/2 -translate-y-1/2 will-change-transform transition-opacity duration-500 group ${
-        isJumping ? 'animate-bounce' : ''
-      }`}
-      title="💧 Click to pet Blue Slime Mascot!"
+      ref={mascotRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onClick={handlePoke}
+      className="fixed top-0 left-0 z-[9990] select-none cursor-grab active:cursor-grabbing will-change-transform group"
+      title="Rimuru Slime Mascot (Click to poke, drag to move!)"
+      style={{ touchAction: 'none' }}
     >
       {/* Speech Bubble */}
       {speech && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 rounded-full bg-cyan-950/90 text-cyan-200 border border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.4)] text-[11px] font-['Chakra_Petch',sans-serif] font-bold whitespace-nowrap animate-in fade-in zoom-in-90 duration-150 pointer-events-none">
-          <span>{speech}</span>
-          {/* Arrow */}
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-cyan-950/90 border-b border-r border-cyan-400/50 rotate-45" />
+        <div
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-xl bg-zinc-900/95 text-cyan-200 border border-cyan-400/40 shadow-[0_8px_24px_rgba(0,0,0,0.8),0_0_15px_rgba(6,182,212,0.3)] text-xs font-mono font-bold whitespace-nowrap animate-in fade-in zoom-in-90 duration-150 pointer-events-none z-10"
+          style={{ transform: facingRight ? 'scaleX(-1)' : 'scaleX(1)' }}
+        >
+          <span className="inline-block">{speech}</span>
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-900 border-b border-r border-cyan-400/40 rotate-45" />
         </div>
       )}
 
-      {/* Blue Slime Mascot Character (SVG) */}
-      <div className="relative w-11 h-11 sm:w-12 sm:h-12 drop-shadow-[0_0_16px_rgba(6,182,212,0.55)] transition-transform duration-150 group-hover:scale-110 active:scale-90">
-        <svg viewBox="0 0 120 120" className="w-full h-full overflow-visible">
-          <defs>
-            {/* Glowing Jello Slime Body Gradient */}
-            <radialGradient id="mascot_jelly" cx="35%" cy="30%" r="70%">
-              <stop stopColor="#a5f3fc" offset="0%" />
-              <stop stopColor="#38bdf8" offset="35%" />
-              <stop stopColor="#0284c7" offset="75%" />
-              <stop stopColor="#0369a1" offset="100%" />
-            </radialGradient>
+      {/* Rimuru Slime Sprite (exact reference from uploaded media) */}
+      <div className={`relative transition-transform duration-150 ${isHappy ? 'scale-115' : ''}`}>
+        <img
+          src={rimuruSlimeImg}
+          alt="Rimuru Slime Mascot"
+          className="w-[68px] sm:w-[76px] h-auto object-contain drop-shadow-[0_8px_18px_rgba(6,182,212,0.45)] pointer-events-none select-none transition-transform"
+          draggable={false}
+          width="76"
+          height="56"
+        />
 
-            {/* Specular curved glint */}
-            <linearGradient id="mascot_glint" x1="0" y1="0" x2="1" y2="1">
-              <stop stopColor="#ffffff" stopOpacity="0.85" offset="0%" />
-              <stop stopColor="#ffffff" stopOpacity="0" offset="100%" />
-            </linearGradient>
+        {/* Subtle ground shadow */}
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-2 rounded-full bg-cyan-950/50 blur-[2px] -z-10" />
 
-            {/* Ambient Aura */}
-            <filter id="mascot_glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#06b6d4" floodOpacity="0.6" />
-            </filter>
-          </defs>
-
-          {/* Main Slime Body (Teardrop jelly blob) */}
-          <path
-            d="M 60 14 C 66 22 98 46 99 74 C 100 98 84 110 60 110 C 36 110 20 98 21 74 C 22 46 54 22 60 14 Z"
-            fill="url(#mascot_jelly)"
-            filter="url(#mascot_glow)"
-          />
-
-          {/* Inner Highlights / Jelly Translucency */}
-          <path
-            d="M 60 20 C 64 27 92 48 93 72 C 94 92 80 104 60 104 C 40 104 26 92 27 72 C 28 48 56 27 60 20 Z"
-            fill="none"
-            stroke="#e0f2fe"
-            strokeWidth="1.8"
-            opacity="0.45"
-          />
-
-          {/* Top-Left Gloss Reflection */}
-          <path
-            d="M 52 24 C 41 33 33 48 33 64 C 33 69 34 73 35 76 C 34 70 34 58 40 45 C 44 35 49 28 52 24 Z"
-            fill="url(#mascot_glint)"
-          />
-
-          {/* Cute Rosy Cheeks */}
-          <ellipse cx="38" cy="80" rx="5.5" ry="3" fill="#f43f5e" opacity="0.4" />
-          <ellipse cx="82" cy="80" rx="5.5" ry="3" fill="#f43f5e" opacity="0.4" />
-
-          {/* Eyes (Open vs Blinking vs Happy ^_^) */}
-          {isHappy ? (
-            // Happy ^_^ eyes
-            <g stroke="#031b33" strokeWidth="3" strokeLinecap="round" fill="none">
-              <path d="M 42 70 Q 48 63 54 70" />
-              <path d="M 66 70 Q 72 63 78 70" />
-            </g>
-          ) : isBlinking ? (
-            // Blinking closed eyes
-            <g stroke="#031b33" strokeWidth="2.8" strokeLinecap="round">
-              <line x1="43" y1="69" x2="53" y2="69" />
-              <line x1="67" y1="69" x2="77" y2="69" />
-            </g>
-          ) : (
-            // Glossy round kawaii eyes
-            <g>
-              {/* Left Eye */}
-              <ellipse cx="48" cy="68" rx="4.5" ry="6.5" fill="#031b33" />
-              <circle cx="46.5" cy="65.5" r="2" fill="#ffffff" />
-              <circle cx="49.5" cy="70.5" r="1" fill="#ffffff" opacity="0.75" />
-
-              {/* Right Eye */}
-              <ellipse cx="72" cy="68" rx="4.5" ry="6.5" fill="#031b33" />
-              <circle cx="70.5" cy="65.5" r="2" fill="#ffffff" />
-              <circle cx="73.5" cy="70.5" r="1" fill="#ffffff" opacity="0.75" />
-            </g>
-          )}
-
-          {/* Cute Little Smile */}
-          <path
-            d="M 56 77 Q 60 82 64 77"
-            fill="none"
-            stroke="#031b33"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-          />
-
-          {/* Sparkle star on top */}
-          <circle cx="60" cy="14" r="2" fill="#e0f2fe" opacity="0.8" />
-        </svg>
+        {/* Small dismiss button on hover */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setIsReleased(false)
+          }}
+          title="Dismiss Rimuru (Click duck in dock to summon back)"
+          className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-zinc-800 hover:bg-rose-600 text-zinc-300 hover:text-white text-[10px] leading-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/20 shadow-sm"
+        >
+          &times;
+        </button>
       </div>
     </div>
   )
