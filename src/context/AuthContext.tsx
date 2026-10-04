@@ -7,7 +7,10 @@ interface AuthContextType {
   session: Session | null
   isLoading: boolean
   isConfigured: boolean
-  signInWithGithub: () => Promise<void>
+  /** True when signed in as the site owner (GitHub @iiafosh). Server-side RLS is the real gate. */
+  isOwner: boolean
+  /** Starts GitHub OAuth. `returnTo` is the in-app path to land on afterwards (default: current path). */
+  signInWithGithub: (returnTo?: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -17,6 +20,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isOwner, setIsOwner] = useState(false)
+
+  useEffect(() => {
+    if (!user || !isSupabaseConfigured) {
+      setIsOwner(false)
+      return
+    }
+    let cancelled = false
+    supabase.rpc('is_portfolio_owner').then(({ data, error }) => {
+      if (!cancelled) setIsOwner(!error && data === true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [user])
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -48,12 +66,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
-  const signInWithGithub = async () => {
+  const signInWithGithub = async (returnTo?: string) => {
     if (!isSupabaseConfigured) {
       alert('Supabase credentials are not configured yet. Please update your .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
       return
     }
 
+    const next = returnTo ?? `${window.location.pathname}${window.location.hash}`
+    try {
+      sessionStorage.setItem('auth_return_to', next)
+    } catch {
+      // storage blocked: callback falls back to home
+    }
     const redirectUrl = `${window.location.origin}/auth/callback`
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
@@ -92,6 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         session,
         isLoading,
         isConfigured: isSupabaseConfigured,
+        isOwner,
         signInWithGithub,
         signOut,
       }}
