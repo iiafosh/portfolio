@@ -28,6 +28,9 @@ function useNavLinks(): NavLink[] {
     } else if (order.has('projects') && has('project')) {
       links.push({ id: 'projects', label: 'Work', match: ['projects'] })
     }
+    if (order.has('achievements') && has('achievement')) {
+      links.push({ id: 'achievements', label: 'Wins', match: ['achievements'] })
+    }
     if (order.has('experience') && has('experience')) {
       links.push({ id: 'experience', label: 'Experience', match: ['experience'] })
     }

@@ -2,6 +2,7 @@
 
 export type SectionKey =
   | 'featured'
+  | 'achievements'
   | 'projects'
   | 'experience'
   | 'education'
@@ -11,6 +12,7 @@ export type SectionKey =
 
 export const ALL_SECTIONS: SectionKey[] = [
   'featured',
+  'achievements',
   'projects',
   'experience',
   'education',
@@ -21,6 +23,7 @@ export const ALL_SECTIONS: SectionKey[] = [
 
 export const SECTION_LABELS: Record<SectionKey, string> = {
   featured: 'Featured',
+  achievements: 'Achievements',
   projects: 'Projects',
   experience: 'Experience',
   education: 'Education',
@@ -51,6 +54,7 @@ export type ItemKind =
   | 'experience'
   | 'education'
   | 'certification'
+  | 'achievement'
   | 'skill_group'
 
 export interface PortfolioItem {

@@ -3,6 +3,7 @@ import { useProfile } from '@/lib/content'
 import type { SectionKey } from '@/content/types'
 import { HeroSection } from '@/sections/Hero'
 import { FeaturedSection } from '@/sections/Featured'
+import { AchievementsSection } from '@/sections/Achievements'
 import { ProjectsSection } from '@/sections/Projects'
 import { ExperienceSection } from '@/sections/Experience'
 import { EducationSection } from '@/sections/Education'
@@ -14,6 +15,7 @@ import { GuestbookSection } from '@/sections/Guestbook'
 // sections disappear until data is added in Supabase.
 const SECTIONS: Record<SectionKey, React.FC> = {
   featured: FeaturedSection,
+  achievements: AchievementsSection,
   projects: ProjectsSection,
   experience: ExperienceSection,
   education: EducationSection,

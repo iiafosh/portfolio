@@ -46,7 +46,7 @@ create table if not exists public.portfolio_profile (
 -- ---------- Items: projects, experience, education, certs, skill groups -------
 create table if not exists public.portfolio_items (
   id text primary key default gen_random_uuid()::text,
-  kind text not null check (kind in ('project','experience','education','certification','skill_group')),
+  kind text not null check (kind in ('project','experience','education','certification','skill_group','achievement')),
   title text not null,
   subtitle text,
   period text,
@@ -203,54 +203,5 @@ begin
   end if;
 end $$;
 
--- ==============================================================================
--- Seed content (only inserts rows that do not exist yet; edits made later in
--- the site's /admin editor are kept). Mirrors src/content/fallback.ts.
--- ==============================================================================
-insert into public.portfolio_profile (id, name, short_name, handle, headline, location, bio, email, availability, github_url, linkedin_url)
-values (
-  1,
-  'Mostafa Kamal Shabara',
-  'Mostafa',
-  'afosh',
-  'AI & Software Engineering student · game & full-stack developer',
-  'Egypt',
-  'I''m an AI & Software Engineering student at Horus University in Egypt. I like shipping things end to end: a cross-platform fishing game in Godot with its own Blender art pipeline, and full-stack web apps on React, TanStack and Supabase.',
-  '8251677@horus.edu.eg',
-  'Open to internships & freelance',
-  'https://github.com/iiafosh',
-  'https://www.linkedin.com/in/mostafa-kamal-3731453a9/'
-)
-on conflict (id) do nothing;
-
-insert into public.portfolio_items (id, kind, title, subtitle, period, location, description, highlights, tags, url, repo_url, image_url, video_url, featured, sort_order) values
-('proj-fosh-and-fish', 'project', 'fosh&fish', 'Cross-platform game · Godot 4 + Blender', '2026', null,
- 'A cozy top-down fishing game inspired by the Virtual Fisher Discord bot. Cast, catch, sell, upgrade your rod and boat, and travel through 7 biomes from the River to the Abyss.',
- array['20 fish, 21 rods, 17 boats, 8 baits and 7 biomes, balanced against the original bot data',
-       'Ships to Web, Windows, Linux and Android from one Godot project',
-       'All art rendered by a scripted Blender pipeline (Python)',
-       'Headless simulation tests for mechanics and balance, plus an automated trailer pipeline with original music'],
- array['Godot 4','GDScript','Blender','Python','GitHub Pages'],
- 'https://iiafosh.github.io/fosh-and-fish/', 'https://github.com/iiafosh/fosh-and-fish',
- '/media/fosh-and-fish-cover.jpg', 'https://github.com/iiafosh/fosh-and-fish/releases/download/v0.1-beta/fosh-and-fish-trailer-16x9.mp4',
- true, 10),
-('proj-portfolio', 'project', 'This portfolio', 'Full-stack web app', '2026', null,
- 'The site you are on. Content, ordering and the guestbook live in Supabase Postgres behind Row Level Security, with GitHub sign-in and an owner-only editor.',
- array['TanStack Router + Query with optimistic updates',
-       'Postgres RLS: anyone reads, only the owner edits, signed-in visitors post to the guestbook',
-       'Deployed on Vercel'],
- array['React','TypeScript','Vite','TanStack','Supabase','Tailwind'],
- null, 'https://github.com/iiafosh/portfolio', null, null, false, 20),
-('proj-afosh-ai', 'project', 'Afosh AI', 'Gemini chat assistant · MSC HUE session', '2026', null,
- 'A persona chatbot built for a Microsoft Student Club session at HUE: a street-smart tech mentor that explains Python, C++ and computer vision with an Egyptian twist.',
- array['Google Gemini API with a custom system persona','Markdown chat UI with streaming-style replies','Auto-deploys with GitHub Actions'],
- array['React','TypeScript','Gemini API','GitHub Actions'],
- null, 'https://github.com/iiafosh/portfolie_for_MSC-mostsfs-kmal', null, null, false, 30),
-('edu-hue', 'education', 'Horus University in Egypt (HUE)', 'Artificial Intelligence & Software Engineering', 'Present', 'New Damietta, Egypt',
- null, '{}', '{}', 'https://horus.edu.eg', null, null, null, false, 10),
-('skill-languages', 'skill_group', 'Languages', null, null, null, null, '{}', array['Python','TypeScript','C++','GDScript','SQL'], null, null, null, null, false, 10),
-('skill-ai', 'skill_group', 'AI & data', null, null, null, null, '{}', array['Computer vision (YOLO)','LLM APIs (Gemini)','Prompt design','Data science'], null, null, null, null, false, 20),
-('skill-web', 'skill_group', 'Web', null, null, null, null, '{}', array['React','Vite','TanStack Router & Query','Tailwind CSS','Supabase','PostgreSQL','Vercel'], null, null, null, null, false, 30),
-('skill-games', 'skill_group', 'Games & 3D', null, null, null, null, '{}', array['Godot 4','Blender (Python scripting)','Game balancing','Multi-platform export'], null, null, null, null, false, 40),
-('skill-tools', 'skill_group', 'Tools', null, null, null, null, '{}', array['Git & GitHub','GitHub Actions','Windows / PowerShell','IT infrastructure'], null, null, null, null, false, 50)
-on conflict (id) do nothing;
+-- Content lives in supabase/content.sql (generated from src/content/fallback.ts).
+-- Run it after this file.

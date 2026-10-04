@@ -32,6 +32,7 @@ const KIND_HINTS: Record<ItemKind, { subtitle: string; tags: string }> = {
   experience: { subtitle: 'Company / organisation', tags: 'Skills used' },
   education: { subtitle: 'Degree / programme', tags: 'Tags' },
   certification: { subtitle: 'Issuer', tags: 'Tags' },
+  achievement: { subtitle: 'Event / organiser', tags: 'Tags' },
   skill_group: { subtitle: 'Optional', tags: 'Skills in this group' },
 }
 

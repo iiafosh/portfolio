@@ -110,6 +110,18 @@ export function buildShowcaseItems(profile: Profile, items: PortfolioItem[]): Sh
     }
   }
 
+  if (order.has('achievements')) {
+    for (const a of visible.filter((i) => i.kind === 'achievement')) {
+      out.push({
+        id: `win-${a.id}`,
+        category: 'Achievement',
+        title: a.title,
+        description: a.subtitle ?? undefined,
+        link: { type: 'section', id: 'achievements', label: 'See all wins' },
+      })
+    }
+  }
+
   for (const e of visible.filter((i) => i.kind === 'education')) {
     out.push({
       id: `edu-${e.id}`,

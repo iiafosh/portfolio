@@ -2,23 +2,24 @@ import type { PortfolioItem, Profile } from './types'
 
 // Local copy of the portfolio content. The site renders this when Supabase is
 // unreachable or the portfolio tables have not been created yet. Keep it in
-// sync with the seed block in supabase/portfolio.sql.
+// sync with supabase/portfolio.sql (seed) and supabase/content.sql (latest).
+// Sources: LinkedIn profile + posts (2026-10) and the GitHub repos.
 
 export const FALLBACK_PROFILE: Profile = {
   name: 'Mostafa Kamal Shabara',
   short_name: 'Mostafa',
   handle: 'afosh',
-  headline: 'AI & Software Engineering student · game & full-stack developer',
-  location: 'Egypt',
+  headline: 'AI & Informatics (Robotics) student · games, apps & hardware',
+  location: 'Mansoura, Egypt',
   bio:
-    "I'm an AI & Software Engineering student at Horus University in Egypt. I like shipping things end to end: a cross-platform fishing game in Godot with its own Blender art pipeline, and full-stack web apps on React, TanStack and Supabase.",
-  email: '8251677@horus.edu.eg',
+    "I'm an AI & Informatics (Robotics) student at Horus University in Egypt. I build across the stack: a 3D fishing game in Godot, mobile apps and an ESP32 health watch at hackathons, ML models for predictive maintenance, and contest solutions with the ICPC HUE community.",
+  email: 'mk1440165@gmail.com',
   availability: 'Open to internships & freelance',
   github_url: 'https://github.com/iiafosh',
   linkedin_url: 'https://www.linkedin.com/in/mostafa-kamal-3731453a9/',
   anghami_url: null,
   avatar_url: null,
-  section_order: ['featured', 'projects', 'experience', 'education', 'skills', 'certifications', 'guestbook'],
+  section_order: ['featured', 'achievements', 'projects', 'experience', 'education', 'skills', 'certifications', 'guestbook'],
 }
 
 const base = {
@@ -36,6 +37,8 @@ const base = {
   visible: true,
 } satisfies Partial<PortfolioItem>
 
+const LINKEDIN = 'https://www.linkedin.com/in/mostafa-kamal-3731453a9/recent-activity/all/'
+
 export const FALLBACK_ITEMS: PortfolioItem[] = [
   // Projects
   {
@@ -43,17 +46,17 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     id: 'proj-fosh-and-fish',
     kind: 'project',
     title: 'fosh&fish',
-    subtitle: 'Cross-platform game · Godot 4 + Blender',
-    period: '2026',
+    subtitle: 'My first game · Godot 4 + Blender',
+    period: 'Oct 2026',
     description:
-      'A cozy top-down fishing game inspired by the Virtual Fisher Discord bot. Cast, catch, sell, upgrade your rod and boat, and travel through 7 biomes from the River to the Abyss.',
+      'A cozy top-down fishing game rebuilt from a Discord fishing bot I was hooked on. Cast, catch, sell, upgrade your rod and boat, and travel through 7 biomes from the River to the Abyss. Open source.',
     highlights: [
       '20 fish, 21 rods, 17 boats, 8 baits and 7 biomes, balanced against the original bot data',
       'Ships to Web, Windows, Linux and Android from one Godot project',
-      'All art rendered by a scripted Blender pipeline (Python)',
-      'Headless simulation tests for mechanics and balance, plus an automated trailer pipeline with original music',
+      '3D assets from itch.io and Sketchfab, reworked and rendered through a scripted Blender pipeline',
+      'Headless simulation tests for mechanics and balance, plus an automated trailer pipeline',
     ],
-    tags: ['Godot 4', 'GDScript', 'Blender', 'Python', 'GitHub Pages'],
+    tags: ['Godot 4', 'GDScript', 'Blender', 'Python', 'AI-assisted dev'],
     url: 'https://iiafosh.github.io/fosh-and-fish/',
     repo_url: 'https://github.com/iiafosh/fosh-and-fish',
     image_url: '/media/fosh-and-fish-cover.jpg',
@@ -63,22 +66,70 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
   },
   {
     ...base,
-    id: 'proj-portfolio',
+    id: 'proj-respark',
     kind: 'project',
-    title: 'This portfolio',
-    subtitle: 'Full-stack web app',
-    period: '2026',
+    title: 'ReSpark',
+    subtitle: 'E-waste recycling app · Green Loop competition',
+    period: 'Sep 2026',
     description:
-      'The site you are on. Content, ordering and the guestbook live in Supabase Postgres behind Row Level Security, with GitHub sign-in and an owner-only editor.',
+      'A website and mobile app for recycling e-waste on two fronts: students take apart old hardware projects and sell the parts to other students, and AI workloads get software strategies that cut the energy and water data centers burn.',
     highlights: [
-      'TanStack Router + Query with optimistic updates',
-      'Postgres RLS: anyone reads, only the owner edits, signed-in visitors post to the guestbook',
-      'Deployed on Vercel',
+      '3rd place in the Horus University round; qualified to represent HUE nationally',
+      'Built the mobile application with a teammate',
+      '36-hour non-stop build sprint with a team of three',
     ],
-    tags: ['React', 'TypeScript', 'Vite', 'TanStack', 'Supabase', 'Tailwind'],
-    url: null,
-    repo_url: 'https://github.com/iiafosh/portfolio',
+    tags: ['Mobile app', 'Web', 'Sustainability', 'Team of 3'],
+    url: LINKEDIN,
     sort_order: 20,
+  },
+  {
+    ...base,
+    id: 'proj-medical-watch',
+    kind: 'project',
+    title: 'Smart Medical Watch',
+    subtitle: 'Hardware + software · Damietta Hackathon',
+    period: 'Jul 2026',
+    description:
+      'A wearable that counts steps and reads heart rate, then streams the data over Wi-Fi to a live web dashboard.',
+    highlights: [
+      'XIAO ESP32-C6 with a 1.28" round TFT, MPU6050 step counting, MAX30100 pulse sensor and GPS',
+      'Fixed unreliable pulse readings by adding 4.7kΩ pull-up resistors',
+      'My part: technical research and the LoRa link in the hardware',
+    ],
+    tags: ['ESP32', 'Arduino', 'LoRa', 'Sensors', 'IoT dashboard'],
+    url: LINKEDIN,
+    sort_order: 30,
+  },
+  {
+    ...base,
+    id: 'proj-robo-space',
+    kind: 'project',
+    title: 'Robo-Space',
+    subtitle: 'Predictive maintenance with ML',
+    period: 'Jun 2026',
+    description:
+      'Analyzes industrial sensor data to predict machine failures before they happen, to cut downtime and repair costs.',
+    highlights: [
+      'Random Forest classifier detecting 6 types of machine failure',
+      'Interactive dashboard: live failure probabilities from temperature, RPM and torque inputs',
+      'ROC curves, feature importance and distribution plots, plus spoken text-to-speech alerts',
+    ],
+    tags: ['Python', 'scikit-learn', 'Pandas', 'Tkinter', 'Matplotlib'],
+    url: LINKEDIN,
+    sort_order: 40,
+  },
+  {
+    ...base,
+    id: 'proj-numlab',
+    kind: 'project',
+    title: 'NumLab',
+    subtitle: 'Numerical methods solver · course project',
+    period: 'Jun 2026',
+    description:
+      'A desktop app that solves numerical methods problems. The team of six wrote all the math algorithms by hand in Python and used AI tools only for the CustomTkinter interface.',
+    tags: ['Python', 'Numerical methods', 'CustomTkinter'],
+    url: LINKEDIN,
+    sort_order: 50,
   },
   {
     ...base,
@@ -89,10 +140,83 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     period: '2026',
     description:
       'A persona chatbot built for a Microsoft Student Club session at HUE: a street-smart tech mentor that explains Python, C++ and computer vision with an Egyptian twist.',
-    highlights: ['Google Gemini API with a custom system persona', 'Markdown chat UI with streaming-style replies', 'Auto-deploys with GitHub Actions'],
+    highlights: ['Google Gemini API with a custom system persona', 'Auto-deploys with GitHub Actions'],
     tags: ['React', 'TypeScript', 'Gemini API', 'GitHub Actions'],
     repo_url: 'https://github.com/iiafosh/portfolie_for_MSC-mostsfs-kmal',
+    sort_order: 60,
+  },
+  {
+    ...base,
+    id: 'proj-portfolio',
+    kind: 'project',
+    title: 'This portfolio',
+    subtitle: 'Full-stack web app',
+    period: '2026',
+    description:
+      'Content, ordering and the guestbook live in Supabase Postgres behind Row Level Security, with GitHub sign-in and an owner-only editor.',
+    tags: ['React', 'TypeScript', 'TanStack', 'Supabase', 'Tailwind'],
+    repo_url: 'https://github.com/iiafosh/portfolio',
+    sort_order: 70,
+  },
+
+  // Achievements
+  {
+    ...base,
+    id: 'win-green-loop',
+    kind: 'achievement',
+    title: '3rd place · Green Loop',
+    subtitle: 'Horus University round, with ReSpark',
+    period: 'Sep 2026',
+    description: 'Top 3 at HUE, qualified to represent the university in the national round.',
+    url: LINKEDIN,
+    sort_order: 10,
+  },
+  {
+    ...base,
+    id: 'win-ecpc',
+    kind: 'achievement',
+    title: '#1 at Horus · ECPC qualifiers',
+    subtitle: 'ICPC HUE community',
+    period: '2026',
+    description: 'Top-ranked Horus team (189th overall), solving 4 problems in 5 hours as first-year students.',
+    url: LINKEDIN,
+    sort_order: 20,
+  },
+  {
+    ...base,
+    id: 'win-damietta',
+    kind: 'achievement',
+    title: 'Qualified · Damietta Hackathon',
+    subtitle: 'With the Smart Medical Watch',
+    period: 'Jul 2026',
+    description: 'Passed the preliminaries in my first year and built a working hardware + software wearable on site.',
+    url: LINKEDIN,
     sort_order: 30,
+  },
+
+  // Experience
+  {
+    ...base,
+    id: 'exp-icpc-hue',
+    kind: 'experience',
+    title: 'Competitive programmer',
+    subtitle: 'ICPC HUE community',
+    period: '2026 — Present',
+    location: 'Horus University',
+    description: 'Training with one of the community’s 16 teams on algorithms and data structures for ICPC-style contests.',
+    highlights: ['Team ranked #1 at Horus in the ECPC qualifiers'],
+    tags: ['C++', 'Algorithms', 'Problem solving'],
+    sort_order: 10,
+  },
+  {
+    ...base,
+    id: 'exp-axis',
+    kind: 'experience',
+    title: 'Member',
+    subtitle: 'AXIS student club',
+    period: 'Present',
+    location: 'Horus University',
+    sort_order: 20,
   },
 
   // Education
@@ -101,8 +225,8 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     id: 'edu-hue',
     kind: 'education',
     title: 'Horus University in Egypt (HUE)',
-    subtitle: 'Artificial Intelligence & Software Engineering',
-    period: 'Present',
+    subtitle: 'Faculty of Artificial Intelligence · AI & Informatics (Robotics)',
+    period: '2025 — Present',
     location: 'New Damietta, Egypt',
     url: 'https://horus.edu.eg',
     sort_order: 10,
@@ -114,7 +238,7 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     id: 'skill-languages',
     kind: 'skill_group',
     title: 'Languages',
-    tags: ['Python', 'TypeScript', 'C++', 'GDScript', 'SQL'],
+    tags: ['Python', 'C++', 'TypeScript', 'GDScript', 'SQL'],
     sort_order: 10,
   },
   {
@@ -122,15 +246,15 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     id: 'skill-ai',
     kind: 'skill_group',
     title: 'AI & data',
-    tags: ['Computer vision (YOLO)', 'LLM APIs (Gemini)', 'Prompt design', 'Data science'],
+    tags: ['scikit-learn', 'Pandas', 'Matplotlib', 'Random Forest', 'LLM APIs (Gemini)', 'Computer vision (YOLO)'],
     sort_order: 20,
   },
   {
     ...base,
-    id: 'skill-web',
+    id: 'skill-hardware',
     kind: 'skill_group',
-    title: 'Web',
-    tags: ['React', 'Vite', 'TanStack Router & Query', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Vercel'],
+    title: 'Hardware & IoT',
+    tags: ['ESP32', 'Arduino IDE', 'LoRa', 'MPU6050 / MAX30100 sensors', 'GPS modules'],
     sort_order: 30,
   },
   {
@@ -138,15 +262,23 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     id: 'skill-games',
     kind: 'skill_group',
     title: 'Games & 3D',
-    tags: ['Godot 4', 'Blender (Python scripting)', 'Game balancing', 'Multi-platform export'],
+    tags: ['Godot 4', 'Blender', 'Game balancing', 'Multi-platform export'],
     sort_order: 40,
+  },
+  {
+    ...base,
+    id: 'skill-web',
+    kind: 'skill_group',
+    title: 'Web & apps',
+    tags: ['React', 'Vite', 'TanStack', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Tkinter / CustomTkinter'],
+    sort_order: 50,
   },
   {
     ...base,
     id: 'skill-tools',
     kind: 'skill_group',
-    title: 'Tools',
-    tags: ['Git & GitHub', 'GitHub Actions', 'Windows / PowerShell', 'IT infrastructure'],
-    sort_order: 50,
+    title: 'Tools & ways of working',
+    tags: ['Git & GitHub', 'GitHub Actions', 'AI-assisted coding', 'Hackathon teamwork'],
+    sort_order: 60,
   },
 ]

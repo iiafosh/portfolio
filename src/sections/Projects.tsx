@@ -1,6 +1,8 @@
 import React from 'react'
 import { ExternalLink } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
+
+const isLinkedIn = (url: string) => url.includes('linkedin.com')
 import { GithubIcon } from '@/components/icons/GithubIcon'
 import { useItemsOfKind, useProfile } from '@/lib/content'
 import type { PortfolioItem } from '@/content/types'
@@ -58,10 +60,10 @@ const ProjectCard: React.FC<{ item: PortfolioItem }> = ({ item }) => (
                 target="_blank"
                 rel="noopener noreferrer"
                 className={linkClass}
-                aria-label={`${item.title}: live site`}
+                aria-label={`${item.title}: ${isLinkedIn(item.url) ? 'write-up on LinkedIn' : 'live site'}`}
               >
                 <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                Live
+                {isLinkedIn(item.url) ? 'Read the post' : 'Live'}
               </a>
             )}
             {item.repo_url && (

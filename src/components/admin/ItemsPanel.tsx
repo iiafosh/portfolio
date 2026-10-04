@@ -7,6 +7,7 @@ import { PanelHeader, SaveStatus, ToolButton, errorText } from './ui'
 
 const KINDS: { kind: ItemKind; label: string; singular: string }[] = [
   { kind: 'project', label: 'Projects', singular: 'project' },
+  { kind: 'achievement', label: 'Achievements', singular: 'achievement' },
   { kind: 'experience', label: 'Experience', singular: 'experience' },
   { kind: 'education', label: 'Education', singular: 'education entry' },
   { kind: 'certification', label: 'Certifications', singular: 'certification' },

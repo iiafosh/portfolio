@@ -91,7 +91,7 @@ export const HeroSection: React.FC = () => {
   if (school) {
     facts.push({
       label: 'Studying',
-      value: school.subtitle ? `${school.subtitle} @ ${shortSchool(school.title)}` : school.title,
+      value: school.subtitle ? `${school.subtitle.split(" · ").pop()} @ ${shortSchool(school.title)}` : school.title,
     })
   }
   if (stack.length > 0) facts.push({ label: 'Stack', value: stack.join(' · ') })

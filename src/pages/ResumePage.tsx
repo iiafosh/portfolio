@@ -37,6 +37,7 @@ export const ResumePage: React.FC = () => {
   const { items: education } = useItemsOfKind('education')
   const { items: skills } = useItemsOfKind('skill_group')
   const { items: certifications } = useItemsOfKind('certification')
+  const { items: achievements } = useItemsOfKind('achievement')
 
   useEffect(() => {
     const previous = document.title
@@ -120,6 +121,22 @@ export const ResumePage: React.FC = () => {
                 <ResumeEntry key={item.id} item={item} showDescription />
               ))}
             </div>
+          </ResumeBlock>
+        )}
+
+        {achievements.length > 0 && (
+          <ResumeBlock title="Achievements">
+            <ul className="space-y-1">
+              {achievements.map((item) => (
+                <li key={item.id} className="flex flex-wrap items-baseline justify-between gap-x-4">
+                  <span>
+                    <span className="font-semibold text-zinc-900">{item.title}</span>
+                    {item.subtitle && <span className="text-zinc-600"> — {item.subtitle}</span>}
+                  </span>
+                  {item.period && <span className="font-mono text-[11px] text-zinc-500 print:text-[8.5pt]">{item.period}</span>}
+                </li>
+              ))}
+            </ul>
           </ResumeBlock>
         )}
 

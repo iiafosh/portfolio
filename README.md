@@ -1,6 +1,6 @@
 # afosh · portfolio
 
-Personal site of **Mostafa Kamal Shabara** ([@iiafosh](https://github.com/iiafosh)): AI & Software Engineering student at Horus University in Egypt, creator of [fosh&fish](https://github.com/iiafosh/fosh-and-fish).
+Personal site of **Mostafa Kamal Shabara** ([@iiafosh](https://github.com/iiafosh)): AI & Informatics (Robotics) student at Horus University in Egypt, creator of [fosh&fish](https://github.com/iiafosh/fosh-and-fish).
 
 **Stack:** Vite · React 18 · TypeScript · TanStack Router & Query · Supabase (Postgres, RLS, GitHub OAuth, Realtime) · Tailwind CSS · Vercel
 
@@ -8,6 +8,7 @@ Personal site of **Mostafa Kamal Shabara** ([@iiafosh](https://github.com/iiafos
 
 - **Recruiter-first home page:** who I am, what I build, resume and contact above the fold, with hover preview cards on GitHub, LinkedIn and Resume.
 - **Featured project:** fosh&fish with a lazy-loaded trailer, screenshots and a "play in browser" link.
+- **Achievements, projects and experience from LinkedIn:** Green Loop 3rd place (ReSpark), #1 Horus team at the ECPC qualifiers, Damietta Hackathon (Smart Medical Watch), Robo-Space, NumLab, ICPC HUE and AXIS.
 - **Content lives in Supabase.** Projects, experience, education, certifications, skills and the *order of sections* are rows in Postgres. Visitors can read them; only the owner can change them (RLS + `is_portfolio_owner()`).
 - **`/admin`:** an owner-only editor. Sign in with GitHub as @iiafosh to reorder sections and items, toggle visibility and edit content.
 - **Guestbook:** visitors sign in with GitHub and leave a message. Updates arrive live over Supabase Realtime. Author names come from the GitHub identity on the server, so they can't be spoofed, and each visitor can post 3 messages a day.
@@ -27,7 +28,7 @@ npm run dev
 
 ### Supabase
 
-1. Open the Supabase SQL Editor and run [`supabase/portfolio.sql`](supabase/portfolio.sql). It's idempotent, so you can run it again; seed rows are only inserted when missing.
+1. In the Supabase SQL Editor, run [`supabase/portfolio.sql`](supabase/portfolio.sql) (schema, RLS; idempotent), then [`supabase/content.sql`](supabase/content.sql) (the content). `content.sql` is generated from `src/content/fallback.ts` with `npm run content:sql`, so the site's built-in copy and the database stay identical. Re-running it overwrites edits made in `/admin` for those rows.
 2. Under **Authentication → Providers → GitHub**, enable GitHub with the Client ID and Secret from a GitHub OAuth app. The app's callback URL is `https://<project>.supabase.co/auth/v1/callback`.
 3. Under **Authentication → URL Configuration**, set the Site URL to the production domain and add these redirect URLs: `http://localhost:5173/auth/callback` and `https://<your-domain>/auth/callback`.
 
