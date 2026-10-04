@@ -24,7 +24,7 @@ const SECTIONS: Record<SectionKey, React.FC> = {
 export const HomePage: React.FC = () => {
   const { profile } = useProfile()
   return (
-    <div className="space-y-20 sm:space-y-28">
+    <div className="space-y-24 sm:space-y-32">
       <HeroSection />
       {profile.section_order.map((key) => {
         const Component = SECTIONS[key]

@@ -18,7 +18,7 @@ export const Avatar: React.FC<AvatarProps> = ({ src, name, fallback, className =
         <img
           src={src}
           alt={name}
-          className="h-full w-full object-cover"
+          className="h-full w-full scale-[1.08] object-cover"
           loading="lazy"
           decoding="async"
           onError={() => setFailed(true)}

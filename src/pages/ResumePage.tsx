@@ -10,7 +10,7 @@ import type { PortfolioItem } from '@/content/types'
 // evergreen browsers); the visibility rules are a fallback for older engines.
 const PRINT_CSS = `
 @media print {
-  @page { size: A4; margin: 14mm; }
+  @page { size: A4; margin: 12mm; }
   html, body { background: white !important; color-scheme: light; }
   body * { visibility: hidden; }
   #resume-paper, #resume-paper * { visibility: visible; }
@@ -77,34 +77,51 @@ export const ResumePage: React.FC = () => {
       <article
         id="resume-paper"
         aria-label={`Resume of ${profile.name}`}
-        className="mx-auto max-w-[210mm] rounded-md bg-white px-5 py-7 font-sans text-[12.5px] leading-[1.5] text-zinc-800 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)] sm:min-h-[297mm] sm:px-[14mm] sm:py-[14mm] print:!min-h-0 print:!max-w-none print:!rounded-none print:!p-0 print:text-[10pt] print:!shadow-none"
+        className="mx-auto max-w-[210mm] rounded-md bg-white px-5 py-7 font-sans text-[12.5px] leading-[1.5] text-zinc-800 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)] sm:min-h-[297mm] sm:px-[12mm] sm:py-[12mm] print:!min-h-0 print:!max-w-none print:!rounded-none print:!p-0 print:text-[9pt] print:leading-[1.35] print:!shadow-none"
       >
         {/* Header */}
-        <header className="border-b border-zinc-200 pb-4">
-          <h1 className="text-[26px] font-semibold leading-tight tracking-tight text-zinc-900 print:text-[20pt]">
-            {profile.name}
-          </h1>
-          {profile.headline && <p className="mt-0.5 text-[14px] font-medium text-sky-700 print:text-[11pt]">{profile.headline}</p>}
-          {contact.length > 0 && (
-            <ul className="mt-2 flex flex-wrap gap-x-2 text-[12px] text-zinc-600 print:text-[9pt]">
-              {contact.map((c, i) => (
-                <li key={c.label} className="flex items-center gap-x-2">
-                  {i > 0 && <span aria-hidden="true" className="text-zinc-300">|</span>}
-                  {c.href ? (
-                    <a
-                      href={c.href}
-                      target={c.href.startsWith('mailto:') ? undefined : '_blank'}
-                      rel="noopener noreferrer"
-                      className="underline decoration-zinc-300 underline-offset-2 hover:text-sky-700 hover:decoration-sky-600"
-                    >
-                      {c.label}
-                    </a>
-                  ) : (
-                    <span>{c.label}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
+        <header className="flex items-start justify-between gap-5 border-b-2 border-zinc-900 pb-3.5">
+          <div className="min-w-0">
+            <h1 className="font-display text-[28px] font-bold leading-none tracking-tight text-zinc-900 print:text-[21pt]">
+              {profile.name}
+            </h1>
+            {profile.headline && (
+              <p className="mt-1.5 text-[14px] font-medium text-sky-700 print:text-[11pt]">{profile.headline}</p>
+            )}
+            {contact.length > 0 && (
+              <ul className="mt-2 flex flex-wrap gap-x-2 gap-y-0.5 text-[12px] text-zinc-600 print:text-[9pt]">
+                {contact.map((c, i) => (
+                  <li key={c.label} className="flex items-center gap-x-2">
+                    {i > 0 && <span aria-hidden="true" className="text-zinc-300">|</span>}
+                    {c.href ? (
+                      <a
+                        href={c.href}
+                        target={c.href.startsWith('mailto:') ? undefined : '_blank'}
+                        rel="noopener noreferrer"
+                        className="underline decoration-zinc-300 underline-offset-2 hover:text-sky-700 hover:decoration-sky-600"
+                      >
+                        {c.label}
+                      </a>
+                    ) : (
+                      <span>{c.label}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {profile.avatar_url && (
+            // The photo file is a circle on a dark square: mask it round and scale past the edge.
+            <span className="hidden h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full ring-2 ring-sky-600/70 ring-offset-2 ring-offset-white min-[420px]:block print:block print:h-[19mm] print:w-[19mm]">
+              <img
+                src={profile.avatar_url}
+                alt=""
+                width={68}
+                height={68}
+                className="h-full w-full scale-[1.1] object-cover"
+                decoding="async"
+              />
+            </span>
           )}
         </header>
 
@@ -116,9 +133,9 @@ export const ResumePage: React.FC = () => {
 
         {experience.length > 0 && (
           <ResumeBlock title="Experience">
-            <div className="space-y-3">
+            <div className="space-y-1.5">
               {experience.map((item) => (
-                <ResumeEntry key={item.id} item={item} showDescription />
+                <ResumeEntry key={item.id} item={item} showDescription showTags={false} />
               ))}
             </div>
           </ResumeBlock>
@@ -126,14 +143,14 @@ export const ResumePage: React.FC = () => {
 
         {achievements.length > 0 && (
           <ResumeBlock title="Achievements">
-            <ul className="space-y-1">
+            <ul className="space-y-0.5">
               {achievements.map((item) => (
                 <li key={item.id} className="flex flex-wrap items-baseline justify-between gap-x-4">
                   <span>
                     <span className="font-semibold text-zinc-900">{item.title}</span>
                     {item.subtitle && <span className="text-zinc-600"> — {item.subtitle}</span>}
                   </span>
-                  {item.period && <span className="font-mono text-[11px] text-zinc-500 print:text-[8.5pt]">{item.period}</span>}
+                  {item.period && <span className="font-mono text-[11px] text-zinc-500 print:text-[8pt]">{item.period}</span>}
                 </li>
               ))}
             </ul>
@@ -142,35 +159,39 @@ export const ResumePage: React.FC = () => {
 
         {projects.length > 0 && (
           <ResumeBlock title="Projects">
-            <div className="space-y-3">
+            <div className="space-y-1.5">
               {projects.map((item) => (
-                <ResumeEntry key={item.id} item={item} maxHighlights={3} showLinks />
+                <ResumeEntry key={item.id} item={item} maxHighlights={1} showLinks />
               ))}
             </div>
           </ResumeBlock>
         )}
 
-        {education.length > 0 && (
-          <ResumeBlock title="Education">
-            <div className="space-y-2">
-              {education.map((item) => (
-                <ResumeEntry key={item.id} item={item} showDescription />
-              ))}
-            </div>
-          </ResumeBlock>
-        )}
+        {(education.length > 0 || skills.length > 0) && (
+          <>
+            {education.length > 0 && (
+              <ResumeBlock title="Education">
+                <div className="space-y-1.5">
+                  {education.map((item) => (
+                    <ResumeEntry key={item.id} item={item} showDescription />
+                  ))}
+                </div>
+              </ResumeBlock>
+            )}
 
-        {skills.length > 0 && (
-          <ResumeBlock title="Skills">
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-              {skills.map((group) => (
-                <React.Fragment key={group.id}>
-                  <dt className="font-semibold text-zinc-900">{group.title}</dt>
-                  <dd className="text-zinc-700">{group.tags.join(', ')}</dd>
-                </React.Fragment>
-              ))}
-            </dl>
-          </ResumeBlock>
+            {skills.length > 0 && (
+              <ResumeBlock title="Skills">
+                <dl className="space-y-0.5">
+                  {skills.map((group) => (
+                    <div key={group.id}>
+                      <dt className="inline font-semibold text-zinc-900">{group.title}: </dt>
+                      <dd className="inline text-zinc-700">{group.tags.join(', ')}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </ResumeBlock>
+            )}
+          </>
         )}
 
         {certifications.length > 0 && (
@@ -195,7 +216,7 @@ export const ResumePage: React.FC = () => {
                       </>
                     )}
                   </span>
-                  {item.period && <span className="font-mono text-[11px] text-zinc-500 print:text-[8.5pt]">{item.period}</span>}
+                  {item.period && <span className="font-mono text-[11px] text-zinc-500 print:text-[8pt]">{item.period}</span>}
                 </li>
               ))}
             </ul>
@@ -207,8 +228,9 @@ export const ResumePage: React.FC = () => {
 }
 
 const ResumeBlock: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <section className="resume-block mt-4">
-    <h2 className="mb-1.5 flex items-center gap-2 font-display text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700 print:text-[8.5pt]">
+  <section className="resume-block mt-3">
+    <h2 className="mb-1.5 flex items-center gap-2 font-display text-[11.5px] font-bold uppercase tracking-[0.16em] text-sky-700 print:text-[8.5pt]">
+      <span aria-hidden="true" className="h-2 w-2 rotate-45 bg-sky-600" />
       {title}
       <span aria-hidden="true" className="h-px flex-1 bg-zinc-200" />
     </h2>
@@ -221,12 +243,12 @@ const ResumeEntry: React.FC<{
   maxHighlights?: number
   showDescription?: boolean
   showLinks?: boolean
-}> = ({ item, maxHighlights, showDescription, showLinks }) => {
-  const highlights = maxHighlights ? item.highlights.slice(0, maxHighlights) : item.highlights
+  showTags?: boolean
+}> = ({ item, maxHighlights, showDescription, showLinks, showTags = true }) => {
+  const highlights = maxHighlights !== undefined ? item.highlights.slice(0, maxHighlights) : item.highlights
   const meta = [item.period, item.location].filter(Boolean).join(' · ')
-  const links = showLinks
-    ? [item.url, item.repo_url].filter((u): u is string => !!u)
-    : []
+  // LinkedIn post links all point at the same activity feed, already in the header.
+  const links = showLinks ? [item.url, item.repo_url].filter((u): u is string => !!u && !u.includes('linkedin.com')) : []
 
   return (
     <div className="resume-block">
@@ -246,35 +268,35 @@ const ResumeEntry: React.FC<{
             </span>
           )}
         </p>
-        {meta && <span className="shrink-0 font-mono text-[11px] text-zinc-500 print:text-[8.5pt]">{meta}</span>}
+        {meta && <span className="shrink-0 font-mono text-[11px] text-zinc-500 print:text-[8pt]">{meta}</span>}
       </div>
 
-      {links.length > 0 && (
-        <p className="text-[11.5px] text-zinc-500 print:text-[8.5pt]">
-          {links.map((u, i) => (
-            <React.Fragment key={u}>
-              {i > 0 && ' · '}
-              <a href={u} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline decoration-sky-300 underline-offset-2">
-                {prettyUrl(u)}
-              </a>
-            </React.Fragment>
-          ))}
-        </p>
-      )}
-
-      {showDescription && item.description && <p className="mt-0.5 text-zinc-700">{item.description}</p>}
+      {showDescription && item.description && <p className="text-zinc-700">{item.description}</p>}
 
       {highlights.length > 0 && (
-        <ul className="mt-1 list-disc space-y-0.5 pl-4 text-zinc-700 marker:text-zinc-400">
+        <ul className="list-disc pl-4 text-zinc-700 marker:text-zinc-400">
           {highlights.map((h) => (
             <li key={h}>{h}</li>
           ))}
         </ul>
       )}
 
-      {item.tags.length > 0 && (
-        <p className="mt-1 text-[11.5px] text-zinc-500 print:text-[8.5pt]">
-          <span className="font-medium text-zinc-600">{item.kind === 'project' ? 'Stack' : 'Skills'}:</span> {item.tags.join(' · ')}
+      {((showTags && item.tags.length > 0) || links.length > 0) && (
+        <p className="text-[11.5px] text-zinc-500 print:text-[8.5pt]">
+          {showTags && item.tags.length > 0 && (
+            <>
+              <span className="font-medium text-zinc-600">{item.kind === 'project' ? 'Stack' : 'Skills'}:</span>{' '}
+              {item.tags.join(' · ')}
+            </>
+          )}
+          {links.map((u, i) => (
+            <React.Fragment key={u}>
+              {(i > 0 || (showTags && item.tags.length > 0)) && ' · '}
+              <a href={u} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline decoration-sky-300 underline-offset-2">
+                {prettyUrl(u)}
+              </a>
+            </React.Fragment>
+          ))}
         </p>
       )}
     </div>

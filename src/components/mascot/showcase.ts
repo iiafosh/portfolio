@@ -30,6 +30,18 @@ const SLIME_TIPS: ShowcaseItem[] = [
     description: "If I'm sitting on something you want to read, just pick me up and move me.",
   },
   {
+    id: 'tip-fling',
+    category: 'Slime tip',
+    title: 'Fling me!',
+    description: "Grab me, give a quick throw and let go. I bounce off the walls. Don't worry, slimes are squishy.",
+  },
+  {
+    id: 'tip-nap',
+    category: 'Slime tip',
+    title: "Leave me alone for a bit and I'll nap.",
+    description: 'Go quiet for about 25 seconds and I doze off. Move or scroll to wake me up.',
+  },
+  {
     id: 'tip-hover',
     category: 'Slime tip',
     title: 'Hover a bubble to keep it open.',
@@ -116,8 +128,32 @@ export function buildShowcaseItems(profile: Profile, items: PortfolioItem[]): Sh
         id: `win-${a.id}`,
         category: 'Achievement',
         title: a.title,
-        description: a.subtitle ?? undefined,
+        description: a.description ? truncate(a.description) : a.subtitle ?? undefined,
         link: { type: 'section', id: 'achievements', label: 'See all wins' },
+      })
+    }
+  }
+
+  if (order.has('experience')) {
+    for (const e of visible.filter((i) => i.kind === 'experience')) {
+      out.push({
+        id: `exp-${e.id}`,
+        category: 'Experience',
+        title: e.subtitle ? `${e.title} · ${e.subtitle}` : e.title,
+        description: e.description ? truncate(e.description) : e.period ?? undefined,
+        link: { type: 'section', id: 'experience', label: 'See experience' },
+      })
+    }
+  }
+
+  if (order.has('certifications')) {
+    for (const c of visible.filter((i) => i.kind === 'certification')) {
+      out.push({
+        id: `cert-${c.id}`,
+        category: 'Certification',
+        title: c.title,
+        description: c.subtitle ?? undefined,
+        link: { type: 'section', id: 'certifications', label: 'All certifications' },
       })
     }
   }
@@ -132,7 +168,6 @@ export function buildShowcaseItems(profile: Profile, items: PortfolioItem[]): Sh
     })
   }
 
-
   out.push({
     id: 'resume',
     category: 'Resume',
@@ -140,7 +175,6 @@ export function buildShowcaseItems(profile: Profile, items: PortfolioItem[]): Sh
     description: 'A clean, printable version of this page.',
     link: { type: 'route', to: '/resume', label: 'Open resume' },
   })
-
 
   return [...out, ...SLIME_TIPS, ...EXCLUSIVE_SHOWCASE_ITEMS]
 }

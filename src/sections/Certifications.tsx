@@ -12,7 +12,7 @@ export const CertificationsSection: React.FC = () => {
     <Section id="certifications" eyebrow="certifications" title="Certifications">
       <ul className={`grid gap-4 ${items.length > 1 ? 'sm:grid-cols-2' : ''}`}>
         {items.map((item) => (
-          <li key={item.id} className="card card-hover flex gap-4 p-5">
+          <li key={item.id} className="reveal card card-hover flex gap-4 p-5">
             <div
               aria-hidden="true"
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slime-400/20 bg-slime-400/[0.07] text-slime-300"
@@ -23,7 +23,7 @@ export const CertificationsSection: React.FC = () => {
               <h3 className="font-display text-base font-semibold leading-snug text-fg">{item.title}</h3>
               {item.subtitle && <p className="mt-0.5 text-sm text-fg-muted">{item.subtitle}</p>}
               {item.period && (
-                <p className="mt-1.5 font-mono text-xs text-fg-faint">
+                <p className="mt-1.5 font-mono text-xs text-fg-muted">
                   <span className="sr-only">Issued </span>
                   {item.period}
                 </p>

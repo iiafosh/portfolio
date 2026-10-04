@@ -4,7 +4,7 @@ import { ArrowUpRight, FileText, GraduationCap } from 'lucide-react'
 import { useItemsOfKind, useProfile } from '@/lib/content'
 import { HoverCardSurface } from './HoverCard'
 
-/** Mini resume preview: who, what, top skills, education. */
+/** Mini resume preview: who, what, top skills, education. Styled as a tiny sheet of paper. */
 export const ResumeCard: React.FC = () => {
   const { profile } = useProfile()
   const { items: skills } = useItemsOfKind('skill_group')
@@ -14,40 +14,43 @@ export const ResumeCard: React.FC = () => {
 
   return (
     <HoverCardSurface>
-      <div className="flex items-center gap-2 border-b border-line bg-white/[0.02] px-4 py-2.5">
-        <FileText className="h-4 w-4 text-slime-300" aria-hidden="true" />
-        <span className="font-pixel text-[10px] uppercase tracking-[0.18em] text-fg-muted">Resume</span>
+      <div className="flex items-center justify-between border-b border-line bg-white/[0.02] px-4 py-2.5">
+        <span className="inline-flex items-center gap-2 font-pixel text-[10px] uppercase tracking-[0.16em] text-fg-muted">
+          <FileText className="h-3.5 w-3.5 text-slime-300" aria-hidden="true" />
+          Resume
+        </span>
+        <span className="font-mono text-[11px] text-fg-faint">1 page · A4</span>
       </div>
-      <div className="space-y-3 p-4">
-        <div>
-          <p className="font-display text-base font-semibold leading-tight text-fg">{profile.name}</p>
-          <p className="mt-1 text-xs leading-snug text-fg-muted">{profile.headline}</p>
+
+      <div className="p-3">
+        {/* Paper */}
+        <div className="rounded-lg bg-white px-3.5 py-3 text-zinc-700 shadow-[0_12px_30px_-12px_rgba(0,0,0,0.8)]">
+          <p className="font-display text-[15px] font-semibold leading-tight text-zinc-900">{profile.name}</p>
+          <p className="mt-0.5 text-[11px] leading-snug text-sky-700">{profile.headline}</p>
+          <span aria-hidden="true" className="my-2 block h-px bg-zinc-200" />
+
+          {topSkills.length > 0 && (
+            <dl className="space-y-1">
+              {topSkills.map((group) => (
+                <div key={group.id} className="grid grid-cols-[5.25rem_1fr] gap-2 text-[11px]">
+                  <dt className="truncate font-semibold text-zinc-900">{group.title}</dt>
+                  <dd className="truncate">{group.tags.slice(0, 3).join(' · ')}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          {school && (
+            <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-snug">
+              <GraduationCap className="mt-px h-3 w-3 shrink-0 text-sky-700" aria-hidden="true" />
+              <span>{school.title}</span>
+            </p>
+          )}
         </div>
-
-        {topSkills.length > 0 && (
-          <dl className="space-y-1.5">
-            {topSkills.map((group) => (
-              <div key={group.id} className="grid grid-cols-[5.5rem_1fr] gap-2 text-xs">
-                <dt className="truncate font-mono text-fg-faint">{group.title}</dt>
-                <dd className="truncate text-fg-muted">{group.tags.slice(0, 3).join(' · ')}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-
-        {school && (
-          <p className="flex items-start gap-2 text-xs text-fg-muted">
-            <GraduationCap className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slime-300" aria-hidden="true" />
-            <span>
-              {school.subtitle ? `${school.subtitle}, ` : ''}
-              {school.title}
-            </span>
-          </p>
-        )}
 
         <Link
           to="/resume"
-          className="inline-flex items-center gap-1 rounded-lg py-1 text-xs font-semibold text-slime-300 transition-colors hover:text-slime-200"
+          className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-lg px-1 text-xs font-semibold text-slime-300 transition-colors hover:text-slime-200"
         >
           Open resume <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>

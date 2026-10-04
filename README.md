@@ -1,51 +1,32 @@
 # afosh · portfolio
 
-Personal site of **Mostafa Kamal Shabara** ([@iiafosh](https://github.com/iiafosh)): AI & Informatics (Robotics) student at Horus University in Egypt, creator of [fosh&fish](https://github.com/iiafosh/fosh-and-fish).
+Personal site of **Mostafa Kamal Shabara** ([@iiafosh](https://github.com/iiafosh) · [LinkedIn](https://www.linkedin.com/in/mostafa-kamal-3731453a9/)): AI & Informatics (Robotics) student at Horus University in Egypt, creator of [fosh&fish](https://github.com/iiafosh/fosh-and-fish).
 
-**Stack:** Vite · React 18 · TypeScript · TanStack Router & Query · Supabase (Postgres, RLS, GitHub OAuth, Realtime) · Tailwind CSS · Vercel
+**Stack:** Vite · React 18 · TypeScript · TanStack Router · Tailwind CSS. Fully static: no backend, no environment variables.
 
 ## What's in it
 
-- **Recruiter-first home page:** who I am, what I build, resume and contact above the fold, with hover preview cards on GitHub, LinkedIn and Resume.
+- **Recruiter-first hero:** who I am, what I build, resume and contact above the fold, with hover preview cards on GitHub, LinkedIn and Resume.
 - **Featured project:** fosh&fish with a lazy-loaded trailer, screenshots and a "play in browser" link.
-- **Achievements, projects and experience from LinkedIn:** Green Loop 3rd place (ReSpark), #1 Horus team at the ECPC qualifiers, Damietta Hackathon (Smart Medical Watch), Robo-Space, NumLab, ICPC HUE and AXIS.
-- **Content lives in Supabase.** Projects, experience, education, certifications, skills and the *order of sections* are rows in Postgres. Visitors can read them; only the owner can change them (RLS + `is_portfolio_owner()`).
-- **`/admin`:** an owner-only editor. Sign in with GitHub as @iiafosh to reorder sections and items, toggle visibility and edit content.
-- **Guestbook:** visitors sign in with GitHub and leave a message. Updates arrive live over Supabase Realtime. Author names come from the GitHub identity on the server, so they can't be spoofed, and each visitor can post 3 messages a day.
+- **Wins, projects and experience from LinkedIn:**
+  - Green Loop 3rd place with ReSpark
+  - #1 Horus team at the ECPC qualifiers
+  - Damietta Hackathon with the Smart Medical Watch
+  - Robo-Space, NumLab, AXIS and ICPC HUE
 - **`/resume`:** a one-page resume built from the same data. "Download PDF" prints it on A4.
-- **Rimuru slime mascot:** wanders the page and points at real things on the site every minute. You can drag it.
-- **Anghami player** and a visit counter in the footer.
+- **Rimuru slime mascot:** wanders, naps, plays and can be flung around. Every minute it points at something on the site.
 
-If Supabase is unreachable or the tables don't exist yet, the site falls back to the copy in `src/content/fallback.ts`.
+## Editing content
 
-## Setup
+All content lives in [`src/content/data.ts`](src/content/data.ts). The section order is `PROFILE.section_order`. Hide an item with `visible: false`. Sections with no items don't render.
+
+## Run
 
 ```bash
 npm install
-cp .env.example .env   # fill VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm run dev
 ```
 
-### Supabase
+## Deploy
 
-1. In the Supabase SQL Editor, run [`supabase/portfolio.sql`](supabase/portfolio.sql) (schema, RLS; idempotent), then [`supabase/content.sql`](supabase/content.sql) (the content). `content.sql` is generated from `src/content/fallback.ts` with `npm run content:sql`, so the site's built-in copy and the database stay identical. Re-running it overwrites edits made in `/admin` for those rows.
-2. Under **Authentication → Providers → GitHub**, enable GitHub with the Client ID and Secret from a GitHub OAuth app. The app's callback URL is `https://<project>.supabase.co/auth/v1/callback`.
-3. Under **Authentication → URL Configuration**, set the Site URL to the production domain and add these redirect URLs: `http://localhost:5173/auth/callback` and `https://<your-domain>/auth/callback`.
-
-The owner is identified by GitHub user id `256016032` (@iiafosh) in `is_portfolio_owner()`.
-
-### Deploy (Vercel)
-
-Import the repo and add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables. `vercel.json` rewrites all routes to the SPA.
-
-## Project layout
-
-```
-supabase/portfolio.sql      schema, RLS, triggers, seed
-src/content/                types + local fallback content
-src/lib/content.ts          React Query hooks (read, owner edits, guestbook, views)
-src/context/AuthContext.tsx GitHub OAuth session + isOwner
-src/sections/               home page sections (rendered in profile.section_order)
-src/pages/                  Home, Resume, Admin, AuthCallback, NotFound
-src/components/             layout, dock, hover cards, mascot, Anghami player
-```
+Works on any static host. On Vercel, import the repo; `vercel.json` rewrites all routes to the SPA.

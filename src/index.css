@@ -2,27 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+
 @layer base {
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 96px;
     color-scheme: dark;
+    scrollbar-color: #24304f #06080f;
+    scrollbar-width: thin;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-ink-950 text-fg font-sans antialiased;
     font-feature-settings: 'ss01', 'cv11';
+    text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: rgba(79, 200, 255, 0.25);
+    background: rgba(79, 200, 255, 0.3);
     color: #fff;
   }
 
   :focus-visible {
     outline: 2px solid theme('colors.slime.400');
-    outline-offset: 2px;
-    border-radius: 6px;
+    outline-offset: 3px;
+    border-radius: 8px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -39,40 +47,143 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Utilities (site tokens that are not in the Tailwind theme)          */
+/* ------------------------------------------------------------------ */
+
+@layer utilities {
+  /* Content column for the whole site (~1120px). */
+  .max-w-content {
+    max-width: 1120px;
+  }
+  /* A slightly stronger hairline for controls. */
+  .border-line-strong {
+    border-color: rgba(148, 180, 255, 0.18);
+  }
+  .bg-line-strong {
+    background-color: rgba(148, 180, 255, 0.18);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Components                                                          */
+/* ------------------------------------------------------------------ */
+
 @layer components {
-  /* Surfaces */
+  /* Surfaces: dark glass with a faint top highlight. */
   .card {
-    @apply rounded-2xl border border-line bg-ink-900/70 shadow-card backdrop-blur-sm;
+    @apply rounded-2xl border border-line shadow-card;
+    background:
+      linear-gradient(180deg, rgba(148, 180, 255, 0.045), rgba(148, 180, 255, 0) 38%),
+      rgba(10, 14, 25, 0.78);
   }
   .card-hover {
-    @apply transition-[border-color,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-slime-400/30;
+    transition:
+      border-color 0.3s ease-out,
+      transform 0.3s ease-out,
+      box-shadow 0.3s ease-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    border-color: rgba(79, 200, 255, 0.25);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 28px 60px -28px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(79, 200, 255, 0.1);
   }
 
-  /* Section heading: pixel eyebrow + display title */
+  /* Cursor-following glow. JS sets --mx / --my (see useSpotlight). */
+  .spotlight {
+    position: relative;
+    isolation: isolate;
+  }
+  .spotlight::before,
+  .spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .spotlight::before {
+    z-index: -1;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 0%),
+      rgba(79, 200, 255, 0.09),
+      transparent 45%
+    );
+  }
+  /* Lit border near the cursor. */
+  .spotlight::after {
+    z-index: 2;
+    padding: 1px;
+    background: radial-gradient(
+      260px circle at var(--mx, 50%) var(--my, 0%),
+      rgba(134, 220, 255, 0.55),
+      transparent 60%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+  .spotlight:hover::before,
+  .spotlight:hover::after,
+  .spotlight:focus-within::before {
+    opacity: 1;
+  }
+
+  /* Section heading: ghost numeral + pixel eyebrow + display title + hairline. */
   .eyebrow {
     @apply font-pixel text-[11px] uppercase tracking-[0.18em] text-slime-300;
   }
   .section-title {
-    @apply font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl;
+    @apply font-display text-[1.75rem] font-bold leading-[1.1] tracking-tight text-fg sm:text-4xl;
+  }
+  .section-index::before {
+    content: counter(section, decimal-leading-zero);
+  }
+  .section-index {
+    @apply select-none font-hero font-black leading-[0.8] tracking-tight;
+    font-size: clamp(3.25rem, 9vw, 5.5rem);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(79, 200, 255, 0.38);
+    background: linear-gradient(180deg, rgba(79, 200, 255, 0.16), rgba(79, 200, 255, 0) 75%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .section-rule {
+    @apply h-px flex-1;
+    background: linear-gradient(90deg, rgba(79, 200, 255, 0.35), rgba(148, 180, 255, 0.1) 30%, transparent);
   }
 
   /* Buttons */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,color] duration-150 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-slime-400 text-ink-950 hover:bg-slime-300 hover:shadow-glow;
+    @apply btn text-ink-950 hover:shadow-glow;
+    background: linear-gradient(180deg, #7ad6ff, #4fc8ff 55%, #2fb8f6);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset, 0 10px 24px -12px rgba(79, 200, 255, 0.7);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(180deg, #9ae1ff, #66d0ff 55%, #3ebff8);
   }
   .btn-ghost {
-    @apply btn border border-line bg-white/[0.03] text-fg hover:border-slime-400/40 hover:bg-white/[0.06];
+    @apply btn border border-line-strong bg-white/[0.03] text-fg hover:border-slime-400/40 hover:bg-white/[0.06];
   }
   .icon-btn {
-    @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-white/[0.03] text-fg-muted transition-all duration-150 hover:border-slime-400/40 hover:bg-white/[0.06] hover:text-fg active:scale-95;
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line-strong bg-white/[0.03] text-fg-muted transition-[transform,background-color,border-color,color] duration-150 hover:border-slime-400/40 hover:bg-white/[0.06] hover:text-fg active:scale-95;
   }
 
   /* Tags */
   .chip {
-    @apply inline-flex items-center rounded-md border border-line bg-white/[0.03] px-2 py-0.5 font-mono text-[11px] text-fg-muted;
+    @apply inline-flex items-center gap-1.5 rounded-md border border-line bg-white/[0.025] px-2 py-[3px] font-mono text-[11px] leading-4 text-fg-muted;
   }
 
   .link {
@@ -82,18 +193,289 @@
   .kbd {
     @apply rounded border border-line bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-fg-muted;
   }
+
+  /* Small mono label used for meta rows ("CLASS", "PROJECTS" ...). */
+  .label {
+    @apply font-pixel text-[10px] uppercase tracking-[0.16em];
+    color: #8a96b0;
+  }
+
+  /* Bullet list used in cards. */
+  .ticks > li {
+    @apply relative pl-4 text-sm leading-relaxed text-fg-muted;
+  }
+  .ticks > li::before {
+    content: '';
+    @apply absolute left-0 top-[0.6rem] h-1 w-2 rounded-full bg-slime-400/70;
+  }
 }
 
-/* Scrollbar */
+/* ------------------------------------------------------------------ */
+/* Hero                                                                */
+/* ------------------------------------------------------------------ */
+
+.hero-name {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(2.75rem, 12.5vw, 5.25rem);
+  background: linear-gradient(100deg, #dff6ff 0%, #86dcff 38%, #4fc8ff 62%, #1d9fe0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@media (min-width: 1280px) {
+  .hero-name {
+    font-size: 5.75rem;
+  }
+}
+/* A glint that sweeps across the name: a masked window slides right while
+   its copy of the text slides left by the same amount, so the letters stay
+   put. Transform-only, so it stays on the compositor. */
+.hero-sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%);
+  mask-image: linear-gradient(100deg, transparent 40%, #000 50%, transparent 60%);
+  animation: sheen-window 7s cubic-bezier(0.45, 0, 0.25, 1) 1.2s infinite both;
+}
+.hero-sheen > span {
+  display: block;
+  color: rgba(255, 255, 255, 0.92);
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.92);
+  animation: sheen-text 7s cubic-bezier(0.45, 0, 0.25, 1) 1.2s infinite both;
+}
+@keyframes sheen-window {
+  0% { transform: translateX(-100%); }
+  28%, 100% { transform: translateX(100%); }
+}
+@keyframes sheen-text {
+  0% { transform: translateX(100%); }
+  28%, 100% { transform: translateX(-100%); }
+}
+
+/* Portrait frame: slime gradient ring + holographic sweep on hover.
+   The photo file is itself a circle on a dark square, so always mask it round. */
+.holo-frame {
+  position: relative;
+  border-radius: 9999px;
+  padding: 3px;
+  background: linear-gradient(145deg, #b5ecff, #4fc8ff 35%, rgba(17, 137, 199, 0.35) 65%, #4fc8ff);
+  box-shadow: 0 0 0 1px rgba(79, 200, 255, 0.15), 0 24px 60px -24px rgba(79, 200, 255, 0.45);
+}
+.holo-frame__inner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: #0e1322;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+.holo-frame__inner img {
+  transform: scale(1.08);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.holo-frame__inner::after {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 38%,
+    rgba(181, 236, 255, 0.0) 40%,
+    rgba(181, 236, 255, 0.28) 46%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(134, 220, 255, 0.22) 54%,
+    transparent 60%
+  );
+  mix-blend-mode: screen;
+  transform: translateX(-60%);
+  opacity: 0;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+}
+.holo-group:hover .holo-frame__inner::after {
+  transform: translateX(60%);
+  opacity: 1;
+}
+.holo-group:hover .holo-frame__inner img {
+  transform: scale(1.12);
+}
+/* Slow HUD ring around the portrait. */
+.orbit {
+  animation: orbit 48s linear infinite;
+}
+@keyframes orbit {
+  to { transform: rotate(360deg); }
+}
+
+/* HUD corner brackets for the player card. */
+.hud {
+  position: relative;
+}
+.hud::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  --c: rgba(79, 200, 255, 0.7);
+  --l: 14px;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--l) 1.5px,
+    linear-gradient(var(--c), var(--c)) top left / 1.5px var(--l),
+    linear-gradient(var(--c), var(--c)) top right / var(--l) 1.5px,
+    linear-gradient(var(--c), var(--c)) top right / 1.5px var(--l),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--l) 1.5px,
+    linear-gradient(var(--c), var(--c)) bottom left / 1.5px var(--l),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--l) 1.5px,
+    linear-gradient(var(--c), var(--c)) bottom right / 1.5px var(--l);
+  background-repeat: no-repeat;
+}
+
+/* ------------------------------------------------------------------ */
+/* Achievements: medal tiers                                           */
+/* ------------------------------------------------------------------ */
+
+.medal {
+  --tier: #86dcff;
+  --tier-rgb: 79, 200, 255;
+  --metal: linear-gradient(145deg, #dff6ff 0%, #86dcff 30%, #22adf0 58%, #b5ecff 78%, #1189c7 100%);
+}
+.medal-gold {
+  --tier: #f4cf6a;
+  --tier-rgb: 244, 207, 106;
+  --metal: linear-gradient(145deg, #fff3c4 0%, #f4cf6a 28%, #c9952b 58%, #ffe08a 78%, #9a6c12 100%);
+}
+.medal-silver {
+  --tier: #d6deea;
+  --tier-rgb: 214, 222, 234;
+  --metal: linear-gradient(145deg, #ffffff 0%, #d6deea 30%, #8e9bb0 58%, #eef2f8 78%, #6b778c 100%);
+}
+.medal-bronze {
+  --tier: #e3a574;
+  --tier-rgb: 227, 165, 116;
+  --metal: linear-gradient(145deg, #ffe0c4 0%, #e3a574 28%, #a8642f 58%, #f0bb8c 78%, #6f3d17 100%);
+}
+.medal-card {
+  border-color: rgba(var(--tier-rgb), 0.16);
+}
+.medal-card:hover {
+  border-color: rgba(var(--tier-rgb), 0.38);
+}
+.medal-glow {
+  background: radial-gradient(closest-side, rgba(var(--tier-rgb), 0.16), transparent);
+}
+.medal-disc {
+  position: relative;
+  overflow: hidden;
+  background: var(--metal);
+  box-shadow:
+    0 0 0 1px rgba(var(--tier-rgb), 0.5),
+    0 0 0 5px rgba(var(--tier-rgb), 0.08),
+    0 12px 28px -10px rgba(var(--tier-rgb), 0.55),
+    inset 0 2px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.3);
+}
+.medal-disc::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.75) 50%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.medal-card:hover .medal-disc::after {
+  transform: translateX(120%);
+}
+.medal-text {
+  color: var(--tier);
+}
+.medal-rule {
+  background: linear-gradient(90deg, rgba(var(--tier-rgb), 0.5), transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Backdrop: aurora + grain                                            */
+/* ------------------------------------------------------------------ */
+
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  will-change: transform;
+}
+.aurora-a {
+  left: 50%;
+  top: -22rem;
+  width: min(70rem, 160vw);
+  height: 40rem;
+  margin-left: calc(min(70rem, 160vw) / -2);
+  background: radial-gradient(closest-side, rgba(79, 200, 255, 0.16), rgba(79, 200, 255, 0.04) 60%, transparent);
+  animation: aurora-a 26s ease-in-out infinite alternate;
+}
+.aurora-b {
+  right: -18rem;
+  top: 30vh;
+  width: 42rem;
+  height: 42rem;
+  background: radial-gradient(closest-side, rgba(34, 173, 240, 0.07), transparent);
+  animation: aurora-b 34s ease-in-out infinite alternate;
+}
+.aurora-c {
+  left: -16rem;
+  bottom: -14rem;
+  width: 46rem;
+  height: 36rem;
+  background: radial-gradient(closest-side, rgba(110, 150, 255, 0.06), transparent);
+  animation: aurora-c 30s ease-in-out infinite alternate;
+}
+@keyframes aurora-a {
+  from { transform: translate3d(-4%, 0, 0) scale(1); }
+  to { transform: translate3d(4%, 3rem, 0) scale(1.08); }
+}
+@keyframes aurora-b {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(-10rem, 8rem, 0) scale(1.15); }
+}
+@keyframes aurora-c {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(8rem, -6rem, 0) scale(0.95); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Scroll reveal. The hidden state only applies once JS has opted in   */
+/* (html.reveal-on), and never with reduced motion or in print.        */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  html.reveal-on .reveal {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    transition:
+      opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+      transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  html.reveal-on .reveal[data-revealed] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Scrollbar                                                           */
+/* ------------------------------------------------------------------ */
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
   background: #06080f;
 }
 ::-webkit-scrollbar-thumb {
   background: #1b2540;
+  border: 2px solid #06080f;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -104,9 +486,13 @@
   .no-print {
     display: none !important;
   }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
-/* Sequential section numbers ("01 // featured") regardless of which sections render */
+/* Sequential section numbers regardless of which sections render. */
 main {
   counter-reset: section;
 }
@@ -114,5 +500,6 @@ main {
   counter-increment: section;
 }
 .section-eyebrow::before {
-  content: counter(section, decimal-leading-zero) ' // ';
+  content: '// ';
+  opacity: 0.6;
 }

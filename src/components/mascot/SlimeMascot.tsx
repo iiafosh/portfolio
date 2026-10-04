@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, X } from 'lucide-react'
-import rimuruSlimeImg from '@/assets/rimuru-slime.png'
 import { useItems, useProfile } from '@/lib/content'
 import { buildShowcaseItems, type ShowcaseItem } from './showcase'
+import { SlimeSprite } from './SlimeSprite'
+import { SlimeEngine, TOP_SAFE } from './engine'
+import { SPRITE_ASPECT, getFaceRig } from './rig'
 
-// Rimuru, the desktop-pet mascot. It idles, hops around the viewport, visits
-// the cursor now and then, can be dragged, and every minute pops a speech
-// bubble that points at something real on the site.
-//
-// Animation runs in one requestAnimationFrame loop writing transforms straight
-// to the DOM, so React never re-renders per frame.
+// Rimuru, the desktop-pet mascot. A little SVG slime with a behaviour state
+// machine (see engine.ts): it hops around, does zoomies, chases the cursor,
+// peeks from the screen edge, naps when you go quiet, and can be picked up and
+// flung. Every minute it hops, shouts "!" and pops a speech bubble that points
+// at something real on the site.
 
 const FIRST_BUBBLE_MS = 12_000
 const BUBBLE_EVERY_MS = 60_000
@@ -18,20 +19,17 @@ const BUBBLE_EVERY_MOBILE_MS = 90_000
 const BUBBLE_VISIBLE_MS = 9_000
 const BUBBLE_LINGER_AFTER_HOVER_MS = 3_000
 
-const SIZE_DESKTOP = 72
-const SIZE_MOBILE = 52
-const ASPECT = 181 / 246 // sprite height / width
-const MIN_Y = 90 // never cover the dock
-const EDGE = 8
-
-const HOP_PERIOD = 0.62 // seconds per hop
-const HOP_HEIGHT = 16
-const HOP_SPEED = 150 // px per second while airborne
+const SIZE_DESKTOP = 44
+const SIZE_MOBILE = 36
 
 const BUBBLE_MAX_W = 256
 const BUBBLE_GUTTER = 12
+const BUBBLE_GAP = 10
+/** Room the bubble needs above the slime (it is up to ~190px tall). */
+const BUBBLE_ROOM = 210
 
-type Mode = 'idle' | 'hop' | 'drag'
+const DROP_COUNT = 6
+const Z_COUNT = 3
 
 interface Placement {
   above: boolean
@@ -42,7 +40,6 @@ interface Placement {
   width: number
 }
 
-const rand = (min: number, max: number) => min + Math.random() * (max - min)
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v))
 
 function useMediaQuery(query: string): boolean {
@@ -69,6 +66,17 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+const ORB_STYLE: React.CSSProperties = {
+  opacity: 0,
+  background:
+    'radial-gradient(circle, #ffffff 0%, #b5ecff 38%, rgba(79,200,255,0.65) 68%, rgba(79,200,255,0) 100%)',
+  boxShadow: '0 0 10px 3px rgba(79,200,255,0.55)',
+}
+const HIDDEN_FX: React.CSSProperties = { opacity: 0 }
+const DROP_STYLE: React.CSSProperties = { opacity: 0, width: 4, height: 4 }
+const BODY_STYLE: React.CSSProperties = { transformOrigin: '50% 100%' }
+const SHADOW_STYLE: React.CSSProperties = { transform: 'translateX(-50%)' }
+
 export const SlimeMascot: React.FC = () => {
   const { profile } = useProfile()
   const { items } = useItems()
@@ -77,83 +85,39 @@ export const SlimeMascot: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 639px)')
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const size = isMobile ? SIZE_MOBILE : SIZE_DESKTOP
+  const spriteH = Math.round(size * SPRITE_ASPECT)
 
   const rootRef = useRef<HTMLDivElement>(null)
-  const spriteRef = useRef<HTMLDivElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
   const shadowRef = useRef<HTMLDivElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
+  const bangRef = useRef<HTMLSpanElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
+  const fxRef = useRef<HTMLDivElement>(null)
+  const engineRef = useRef<SlimeEngine | null>(null)
 
-  // Mutable simulation state, read by the rAF loop.
-  const sim = useRef({
-    x: 0,
-    y: 0,
-    tx: 0,
-    ty: 0,
-    mode: 'idle' as Mode,
-    hopT: 0,
-    facingRight: false,
-    nextActionAt: 0,
-    time: 0,
-    dragDX: 0,
-    dragDY: 0,
-    mouseX: -1,
-    mouseY: -1,
-    mouseAt: 0,
-    placed: false,
-  })
-  const cfg = useRef({ size, isMobile, reducedMotion, speaking: false })
-  cfg.current.size = size
-  cfg.current.isMobile = isMobile
-  cfg.current.reducedMotion = reducedMotion
+  const cfg = useRef({ size, isMobile, reducedMotion })
+  cfg.current = { size, isMobile, reducedMotion }
 
   const [active, setActive] = useState<ShowcaseItem | null>(null)
   const [placement, setPlacement] = useState<Placement>({ above: true, left: 0, tail: 0, width: BUBBLE_MAX_W })
-  cfg.current.speaking = active !== null
+  const speakingRef = useRef(false)
+  speakingRef.current = active !== null
 
-  // ---- geometry helpers ----------------------------------------------------
-
-  const bounds = useCallback(() => {
-    const s = cfg.current.size
-    const h = s * ASPECT
-    const vw = window.innerWidth
-    const vh = window.innerHeight
-    return {
-      minX: EDGE,
-      maxX: Math.max(EDGE, vw - s - EDGE),
-      minY: Math.min(MIN_Y, Math.max(0, vh - h - EDGE)),
-      maxY: Math.max(MIN_Y, vh - h - EDGE),
-    }
-  }, [])
-
-  const cornerSpot = useCallback(() => {
-    const b = bounds()
-    return { x: b.maxX - 8, y: b.maxY - 8 }
-  }, [bounds])
-
-  const applyTransform = useCallback((lift = 0, sx = 1, sy = 1) => {
-    const s = sim.current
-    if (rootRef.current) rootRef.current.style.transform = `translate3d(${s.x}px, ${s.y}px, 0)`
-    if (spriteRef.current) {
-      const flip = s.facingRight ? -1 : 1
-      spriteRef.current.style.transform = `translate3d(0, ${-lift}px, 0) scale(${flip * sx}, ${sy})`
-    }
-    if (shadowRef.current) {
-      const k = 1 - Math.min(1, lift / HOP_HEIGHT) * 0.35
-      shadowRef.current.style.transform = `translateX(-50%) scale(${k})`
-      shadowRef.current.style.opacity = String(0.4 + 0.6 * k)
-    }
-  }, [])
+  // ---- bubble placement ----------------------------------------------------
 
   const computePlacement = useCallback(() => {
-    const s = sim.current
-    const vw = window.innerWidth
+    const eng = engineRef.current
+    if (!eng) return
+    const vw = document.documentElement.clientWidth || window.innerWidth
     const width = Math.min(BUBBLE_MAX_W, vw - BUBBLE_GUTTER * 2)
-    const centerX = s.x + cfg.current.size / 2
+    const centerX = eng.x + cfg.current.size / 2
     const absLeft = clamp(centerX - width / 2, BUBBLE_GUTTER, vw - width - BUBBLE_GUTTER)
     const next: Placement = {
-      // Below the slime when there isn't room above it (bubble is up to ~190px tall).
-      above: s.y > MIN_Y + 200,
-      left: Math.round(absLeft - s.x),
-      tail: Math.round(clamp(centerX - absLeft, 18, width - 18)),
+      // Flip below the slime when there isn't room above it.
+      above: eng.y > TOP_SAFE + BUBBLE_ROOM,
+      left: Math.round(absLeft - eng.x),
+      tail: Math.round(clamp(centerX - absLeft, 16, width - 16)),
       width,
     }
     setPlacement((prev) =>
@@ -163,164 +127,66 @@ export const SlimeMascot: React.FC = () => {
     )
   }, [])
 
-  const pickWanderTarget = useCallback(() => {
-    const s = sim.current
-    const b = bounds()
-    const { isMobile: mobile, size: sz } = cfg.current
-    const now = performance.now()
-    if (!mobile && s.mouseX >= 0 && now - s.mouseAt < 6000 && Math.random() < 0.3) {
-      // Curiosity visit: land a little way off the cursor, never on it.
-      const angle = rand(0, Math.PI * 2)
-      const dist = rand(90, 130)
-      s.tx = clamp(s.mouseX + Math.cos(angle) * dist - sz / 2, b.minX, b.maxX)
-      s.ty = clamp(s.mouseY + Math.sin(angle) * dist - sz / 2, b.minY, b.maxY)
-    } else if (mobile) {
-      // Phones: stay in the bottom-right area, out of the reading column.
-      const vw = window.innerWidth
-      const vh = window.innerHeight
-      s.tx = clamp(rand(vw * 0.55, b.maxX), b.minX, b.maxX)
-      s.ty = clamp(rand(vh * 0.62, b.maxY), b.minY, b.maxY)
-    } else {
-      s.tx = rand(b.minX, b.maxX)
-      s.ty = rand(Math.max(b.minY, 140), b.maxY)
-    }
-    s.facingRight = s.tx > s.x
-  }, [bounds])
+  // The engine reports movement every frame; re-place the bubble at most every
+  // ~90ms (with a trailing update) and only while it is open.
+  const placeTimer = useRef(0)
+  const onMove = useCallback(() => {
+    if (!speakingRef.current || placeTimer.current) return
+    placeTimer.current = window.setTimeout(() => {
+      placeTimer.current = 0
+      computePlacement()
+    }, 90)
+  }, [computePlacement])
+  const onMoveRef = useRef(onMove)
+  onMoveRef.current = onMove
 
-  // ---- initial placement + resize ------------------------------------------
+  // ---- engine lifecycle ----------------------------------------------------
 
   useEffect(() => {
-    const s = sim.current
-    if (!s.placed) {
-      const c = cornerSpot()
-      s.x = s.tx = c.x
-      s.y = s.ty = c.y
-      s.placed = true
-      s.nextActionAt = performance.now() + 4000
+    const root = rootRef.current
+    const body = bodyRef.current
+    const shadow = shadowRef.current
+    const glow = glowRef.current
+    const bang = bangRef.current
+    const svg = svgRef.current
+    const fx = fxRef.current
+    if (!root || !body || !shadow || !glow || !bang || !svg || !fx) return
+    const orb = fx.querySelector<HTMLElement>('[data-fx="orb"]')
+    if (!orb) return
+
+    const engine = new SlimeEngine(
+      {
+        root,
+        body,
+        shadow,
+        glow,
+        bang,
+        face: getFaceRig(svg),
+        drops: Array.from(fx.querySelectorAll<HTMLElement>('[data-fx="drop"]')),
+        zs: Array.from(fx.querySelectorAll<HTMLElement>('[data-fx="z"]')),
+        orb,
+      },
+      { size: cfg.current.size, mobile: cfg.current.isMobile, reduced: cfg.current.reducedMotion },
+      () => onMoveRef.current(),
+    )
+    engineRef.current = engine
+    engine.run()
+    return () => {
+      engine.destroy()
+      engineRef.current = null
+      window.clearTimeout(placeTimer.current)
+      placeTimer.current = 0
     }
-    applyTransform()
-
-    const onResize = () => {
-      const b = bounds()
-      s.x = clamp(s.x, b.minX, b.maxX)
-      s.y = clamp(s.y, b.minY, b.maxY)
-      s.tx = clamp(s.tx, b.minX, b.maxX)
-      s.ty = clamp(s.ty, b.minY, b.maxY)
-      applyTransform()
-      if (cfg.current.speaking) computePlacement()
-    }
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [applyTransform, bounds, computePlacement, cornerSpot])
-
-  // Size changes (crossing the phone breakpoint) need a re-clamp too.
-  useEffect(() => {
-    window.dispatchEvent(new Event('resize'))
-  }, [size])
-
-  // Reduced motion: sit in the corner and stay put.
-  useEffect(() => {
-    if (!reducedMotion) return
-    const s = sim.current
-    const c = cornerSpot()
-    s.x = s.tx = c.x
-    s.y = s.ty = c.y
-    s.mode = 'idle'
-    applyTransform()
-  }, [reducedMotion, cornerSpot, applyTransform])
-
-  // ---- cursor tracking for curiosity visits --------------------------------
-
-  useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== 'mouse') return
-      const s = sim.current
-      s.mouseX = e.clientX
-      s.mouseY = e.clientY
-      s.mouseAt = performance.now()
-    }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    return () => window.removeEventListener('pointermove', onMove)
   }, [])
 
-  // ---- animation loop ------------------------------------------------------
+  useEffect(() => {
+    engineRef.current?.setConfig({ size, mobile: isMobile, reduced: reducedMotion })
+    if (speakingRef.current) computePlacement()
+  }, [size, isMobile, reducedMotion, computePlacement])
 
   useEffect(() => {
-    if (reducedMotion) return
-    let raf = 0
-    let last = performance.now()
-
-    const frame = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000) // clamp after tab switches
-      last = now
-      const s = sim.current
-      s.time += dt
-
-      if (s.mode === 'drag') {
-        // Pointer handlers own the transform while dragging.
-      } else if (s.mode === 'hop') {
-        s.hopT += dt / HOP_PERIOD
-        if (s.hopT >= 1) {
-          s.hopT -= 1
-          if (Math.hypot(s.tx - s.x, s.ty - s.y) < 3) {
-            s.mode = 'idle'
-            s.hopT = 0
-            s.nextActionAt = now + rand(2500, 6000)
-          }
-        }
-        const t = s.hopT
-        let lift = 0
-        let sx = 1
-        let sy = 1
-        if (s.mode === 'hop') {
-          if (t < 0.18) {
-            // Anticipation: squash before take-off.
-            const k = Math.sin((t / 0.18) * Math.PI)
-            sx = 1 + 0.14 * k
-            sy = 1 - 0.16 * k
-          } else if (t < 0.82) {
-            // Airborne: stretched at take-off/landing, round at the apex.
-            const k = (t - 0.18) / 0.64
-            lift = Math.sin(k * Math.PI) * HOP_HEIGHT
-            const stretch = Math.abs(Math.cos(k * Math.PI))
-            sx = 1 - 0.08 * stretch
-            sy = 1 + 0.12 * stretch
-            const dx = s.tx - s.x
-            const dy = s.ty - s.y
-            const dist = Math.hypot(dx, dy)
-            if (dist > 0.5) {
-              const step = Math.min(dist, HOP_SPEED * dt)
-              s.x += (dx / dist) * step
-              s.y += (dy / dist) * step
-            }
-          } else {
-            // Landing squash.
-            const k = Math.sin(((t - 0.82) / 0.18) * Math.PI)
-            sx = 1 + 0.16 * k
-            sy = 1 - 0.18 * k
-          }
-        }
-        applyTransform(lift, sx, sy)
-      } else {
-        // Idle: gentle breathing, then decide what to do next.
-        const b = Math.sin(s.time * 2.4)
-        applyTransform(0, 1 - 0.025 * b, 1 + 0.035 * b)
-        if (now >= s.nextActionAt) {
-          if (cfg.current.speaking) {
-            s.nextActionAt = now + 1500 // stay still while talking
-          } else {
-            pickWanderTarget()
-            s.mode = 'hop'
-            s.hopT = 0
-          }
-        }
-      }
-      raf = requestAnimationFrame(frame)
-    }
-
-    raf = requestAnimationFrame(frame)
-    return () => cancelAnimationFrame(raf)
-  }, [reducedMotion, applyTransform, pickWanderTarget])
+    engineRef.current?.setSpeaking(active !== null)
+  }, [active])
 
   // ---- speech bubble scheduling --------------------------------------------
 
@@ -340,30 +206,27 @@ export const SlimeMascot: React.FC = () => {
     setActive(null)
   }, [])
 
-  const armHide = useCallback(
-    (ms: number) => {
-      window.clearTimeout(hideTimer.current)
-      hideTimer.current = window.setTimeout(() => {
-        if (!hoveringRef.current) setActive(null)
-      }, ms)
-    },
-    [],
-  )
+  const armHide = useCallback((ms: number) => {
+    window.clearTimeout(hideTimer.current)
+    hideTimer.current = window.setTimeout(() => {
+      if (!hoveringRef.current) setActive(null)
+    }, ms)
+  }, [])
 
   const showNext = useCallback(() => {
     if (document.hidden) return
     if (queueRef.current.length === 0) queueRef.current = shuffle(showcaseRef.current)
     const next = queueRef.current.shift()
     if (!next) return
-    const s = sim.current
-    // Stop wandering so the bubble stays anchored while it's open.
-    if (s.mode === 'hop') {
-      s.tx = s.x
-      s.ty = s.y
+    const reveal = () => {
+      computePlacement()
+      setActive(next)
+      armHide(BUBBLE_VISIBLE_MS)
     }
-    computePlacement()
-    setActive(next)
-    armHide(BUBBLE_VISIBLE_MS)
+    // The slime hops and shouts "!" first, then the bubble appears.
+    const engine = engineRef.current
+    if (engine) engine.announce(reveal)
+    else reveal()
   }, [armHide, computePlacement])
 
   useEffect(() => {
@@ -388,121 +251,134 @@ export const SlimeMascot: React.FC = () => {
     armHide(BUBBLE_LINGER_AFTER_HOVER_MS)
   }
 
-  // ---- dragging (mouse + touch via pointer events) -------------------------
+  // ---- pointer: hover, drag and fling (mouse + touch) ----------------------
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return
-    const s = sim.current
-    s.mode = 'drag'
-    s.dragDX = e.clientX - s.x
-    s.dragDY = e.clientY - s.y
     e.currentTarget.setPointerCapture(e.pointerId)
-    applyTransform(0, 1.12, 0.9)
+    engineRef.current?.pointerDown(e.clientX, e.clientY)
   }
-
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const s = sim.current
-    if (s.mode !== 'drag') return
-    const b = bounds()
-    const nx = clamp(e.clientX - s.dragDX, b.minX, b.maxX)
-    const ny = clamp(e.clientY - s.dragDY, b.minY, b.maxY)
-    if (Math.abs(nx - s.x) > 0.5) s.facingRight = nx > s.x
-    s.x = nx
-    s.y = ny
-    // Jelly wobble while carried.
-    applyTransform(0, 0.92, 1.1)
-    if (cfg.current.speaking) computePlacement()
+    engineRef.current?.pointerMove(e.clientX, e.clientY)
   }
-
   const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    const s = sim.current
-    if (s.mode !== 'drag') return
     if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId)
-    s.mode = 'idle'
-    s.tx = s.x
-    s.ty = s.y
-    s.nextActionAt = performance.now() + rand(4000, 7000)
-    applyTransform()
-    if (cfg.current.speaking) computePlacement()
+    engineRef.current?.pointerUp(e.type === 'pointercancel')
+  }
+  const onPointerEnter = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse') engineRef.current?.hover(true)
+  }
+  const onPointerLeave = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse') engineRef.current?.hover(false)
   }
 
   // ---- render --------------------------------------------------------------
 
-  const spriteH = Math.round(size * ASPECT)
-
   return (
-    <div
-      ref={rootRef}
-      className="no-print pointer-events-none fixed left-0 top-0 z-40 will-change-transform"
-      style={{ width: size, height: spriteH }}
-    >
-      <div role="status" aria-live="polite" aria-atomic="true">
-        {active && (
-          <div
-            onMouseEnter={onBubbleEnter}
-            onMouseLeave={onBubbleLeave}
-            onFocus={onBubbleEnter}
-            onBlur={onBubbleLeave}
-            className="pointer-events-auto absolute animate-pop-in rounded-2xl border border-slime-400/25 bg-ink-850/95 p-3.5 pr-3 shadow-card backdrop-blur-md"
-            style={{
-              width: placement.width,
-              left: placement.left,
-              ...(placement.above ? { bottom: spriteH + 14 } : { top: spriteH + 14 }),
-            }}
+    <>
+      {/* Particles (droplets, z's, the snack orb) in viewport coordinates. */}
+      <div ref={fxRef} aria-hidden="true" className="no-print pointer-events-none fixed left-0 top-0 z-40 h-0 w-0">
+        {Array.from({ length: DROP_COUNT }, (_, i) => (
+          <span
+            key={`d${i}`}
+            data-fx="drop"
+            className="absolute left-0 top-0 rounded-full bg-slime-200 shadow-[0_0_6px_rgba(79,200,255,0.8)] will-change-transform"
+            style={DROP_STYLE}
+          />
+        ))}
+        {Array.from({ length: Z_COUNT }, (_, i) => (
+          <span
+            key={`z${i}`}
+            data-fx="z"
+            className="absolute left-0 top-0 font-pixel text-[10px] leading-none text-slime-200 will-change-transform"
+            style={HIDDEN_FX}
           >
-            <span
-              aria-hidden="true"
-              className={`absolute h-3 w-3 rotate-45 border-slime-400/25 bg-ink-850 ${
-                placement.above ? '-bottom-1.5 border-b border-r' : '-top-1.5 border-l border-t'
-              }`}
-              style={{ left: placement.tail - 6 }}
-            />
-            <div className="flex items-start justify-between gap-2">
-              <p className="font-pixel text-[10px] uppercase tracking-[0.16em] text-slime-300">{active.category}</p>
-              <button
-                type="button"
-                onClick={dismiss}
-                aria-label="Dismiss message"
-                className="-mr-1 -mt-1.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-fg-faint transition-colors hover:bg-white/[0.06] hover:text-fg"
-              >
-                <X className="h-3.5 w-3.5" aria-hidden="true" />
-              </button>
-            </div>
-            <p className="-mt-1 font-display text-sm font-semibold leading-snug text-fg">{active.title}</p>
-            {active.description && (
-              <p className="mt-1 text-xs leading-relaxed text-fg-muted">{active.description}</p>
-            )}
-            {active.link && <BubbleLink link={active.link} onNavigate={dismiss} />}
-          </div>
-        )}
+            z
+          </span>
+        ))}
+        <span data-fx="orb" className="absolute left-0 top-0 h-2.5 w-2.5 rounded-full will-change-transform" style={ORB_STYLE} />
       </div>
 
       <div
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        className="pointer-events-auto relative h-full w-full cursor-grab touch-none select-none active:cursor-grabbing"
-        title="Drag me"
+        ref={rootRef}
+        className="no-print pointer-events-none fixed left-0 top-0 z-40 will-change-transform"
+        style={{ width: size, height: spriteH }}
       >
+        <div role="status" aria-live="polite" aria-atomic="true">
+          {active && (
+            <div
+              onMouseEnter={onBubbleEnter}
+              onMouseLeave={onBubbleLeave}
+              onFocus={onBubbleEnter}
+              onBlur={onBubbleLeave}
+              className="pointer-events-auto absolute animate-pop-in rounded-2xl border border-slime-400/25 bg-ink-850/95 p-3.5 pr-3 shadow-card backdrop-blur-md"
+              style={{
+                width: placement.width,
+                left: placement.left,
+                ...(placement.above ? { bottom: spriteH + BUBBLE_GAP } : { top: spriteH + BUBBLE_GAP }),
+              }}
+            >
+              <span
+                aria-hidden="true"
+                className={`absolute h-3 w-3 rotate-45 border-slime-400/25 bg-ink-850 ${
+                  placement.above ? '-bottom-1.5 border-b border-r' : '-top-1.5 border-l border-t'
+                }`}
+                style={{ left: placement.tail - 6 }}
+              />
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-pixel text-[10px] uppercase tracking-[0.16em] text-slime-300">{active.category}</p>
+                <button
+                  type="button"
+                  onClick={dismiss}
+                  aria-label="Dismiss message"
+                  className="-mr-1 -mt-1.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-fg-faint transition-colors hover:bg-white/[0.06] hover:text-fg"
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </div>
+              <p className="-mt-1 font-display text-sm font-semibold leading-snug text-fg">{active.title}</p>
+              {active.description && <p className="mt-1 text-xs leading-relaxed text-fg-muted">{active.description}</p>}
+              {active.link && <BubbleLink link={active.link} onNavigate={dismiss} />}
+            </div>
+          )}
+        </div>
+
         <div
-          ref={shadowRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onPointerEnter={onPointerEnter}
+          onPointerLeave={onPointerLeave}
           aria-hidden="true"
-          className="absolute -bottom-1 left-1/2 h-2 w-3/4 rounded-full bg-black/50 blur-[3px]"
-          style={{ transform: 'translateX(-50%)' }}
-        />
-        <div ref={spriteRef} aria-hidden="true" className="relative h-full w-full origin-bottom will-change-transform">
-          <img
-            src={rimuruSlimeImg}
-            alt=""
-            width={size}
-            height={spriteH}
-            draggable={false}
-            className="pointer-events-none h-full w-full select-none object-contain drop-shadow-[0_6px_14px_rgba(79,200,255,0.35)]"
+          className="pointer-events-auto relative h-full w-full cursor-grab touch-none select-none active:cursor-grabbing"
+        >
+          <div
+            ref={shadowRef}
+            className="pointer-events-none absolute -bottom-0.5 left-1/2 h-1.5 w-3/4 rounded-full bg-black/50 blur-[2px]"
+            style={SHADOW_STYLE}
           />
+          <div ref={bodyRef} className="pointer-events-none relative h-full w-full will-change-transform" style={BODY_STYLE}>
+            <div
+              ref={glowRef}
+              className="absolute inset-[-20%] rounded-full bg-slime-300/50 blur-md"
+              style={HIDDEN_FX}
+            />
+            <SlimeSprite
+              ref={svgRef}
+              className="relative h-full w-full overflow-visible drop-shadow-[0_3px_8px_rgba(79,200,255,0.35)]"
+            />
+          </div>
+          <span
+            ref={bangRef}
+            className="pointer-events-none absolute bottom-full left-1/2 font-hero text-base font-black leading-none text-slime-200 [text-shadow:0_0_8px_rgba(79,200,255,0.9)]"
+            style={HIDDEN_FX}
+          >
+            !
+          </span>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
