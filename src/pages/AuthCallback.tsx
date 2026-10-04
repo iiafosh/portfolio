@@ -1,82 +1,98 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { supabase } from '@/lib/supabase'
-import { RefreshCw, AlertCircle } from 'lucide-react'
+import { Link, useRouter } from '@tanstack/react-router'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+
+/** Reads (and clears) the in-app path saved before the OAuth redirect. Only same-site paths are allowed. */
+function takeReturnPath(): string {
+  let path: string | null = null
+  try {
+    path = sessionStorage.getItem('auth_return_to')
+    sessionStorage.removeItem('auth_return_to')
+  } catch {
+    // storage blocked
+  }
+  if (!path || !path.startsWith('/') || path.startsWith('//') || path.startsWith('/auth/callback')) return '/'
+  return path
+}
+
+function errorFromUrl(): string | null {
+  const query = new URLSearchParams(window.location.search)
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+  const raw =
+    query.get('error_description') ?? hash.get('error_description') ?? query.get('error') ?? hash.get('error')
+  return raw ? raw.replace(/\+/g, ' ') : null
+}
 
 export const AuthCallback: React.FC = () => {
-  const navigate = useNavigate()
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  const [error, setError] = useState<string | null>(() => errorFromUrl())
 
   useEffect(() => {
-    // Supabase will automatically parse the hash/code in URL
-    const checkSession = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession()
+    if (error) return
+    if (!isSupabaseConfigured) {
+      setError('Sign-in is not configured on this site yet.')
+      return
+    }
 
-        if (error) {
-          setError(error.message)
-          return
-        }
-
-        if (data.session) {
-          navigate({ to: '/database' })
-          return
-        }
-
-        // If not immediately available, subscribe once
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-          if (event === 'SIGNED_IN' && session) {
-            navigate({ to: '/database' })
-          }
-        })
-
-        // Timeout fallback after 4 seconds
-        const timeout = setTimeout(() => {
-          navigate({ to: '/database' })
-        }, 4000)
-
-        return () => {
-          authListener.subscription.unsubscribe()
-          clearTimeout(timeout)
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message)
-        } else {
-          setError('An unexpected authentication error occurred.')
-        }
+    let done = false
+    const go = (path: string) => {
+      if (done) return
+      done = true
+      if (path.includes('#')) {
+        // Full navigation so the browser scrolls to the hash section once the page renders.
+        window.location.replace(path)
+      } else {
+        router.history.replace(path)
       }
     }
 
-    checkSession()
-  }, [navigate])
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) go(takeReturnPath())
+    })
+
+    supabase.auth.getSession().then(({ data, error: sessionError }) => {
+      if (done) return
+      if (sessionError) {
+        done = true
+        setError(sessionError.message)
+        return
+      }
+      if (data.session) go(takeReturnPath())
+    })
+
+    const timer = window.setTimeout(() => {
+      if (done) return
+      takeReturnPath() // clear the stale value
+      go('/')
+    }, 4000)
+
+    return () => {
+      done = true
+      subscription.unsubscribe()
+      window.clearTimeout(timer)
+    }
+  }, [error, router])
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-8 backdrop-blur-sm text-center shadow-xl space-y-4">
+    <div className="flex min-h-[60vh] items-center justify-center py-16">
+      <div className="card w-full max-w-sm p-8 text-center animate-pop-in" role={error ? 'alert' : 'status'}>
         {error ? (
           <>
-            <div className="w-12 h-12 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-2xl flex items-center justify-center mx-auto">
-              <AlertCircle className="w-6 h-6" />
-            </div>
-            <h2 className="text-xl font-bold text-white">Authentication Failed</h2>
-            <p className="text-xs text-rose-300">{error}</p>
-            <button
-              onClick={() => navigate({ to: '/' })}
-              className="mt-4 inline-flex items-center justify-center px-4 py-2 bg-slate-800 text-white text-xs font-semibold rounded-xl hover:bg-slate-700 transition-colors"
-            >
-              Back to Overview
-            </button>
+            <AlertCircle className="mx-auto h-8 w-8 text-rose-300" aria-hidden="true" />
+            <h1 className="mt-3 font-display text-xl font-bold text-fg">Sign-in didn't work</h1>
+            <p className="mt-2 break-words text-sm text-fg-muted">{error}</p>
+            <Link to="/" className="btn-ghost mt-6">
+              Back home
+            </Link>
           </>
         ) : (
           <>
-            <div className="w-12 h-12 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto">
-              <RefreshCw className="w-6 h-6 animate-spin" />
-            </div>
-            <h2 className="text-xl font-bold text-white">Completing GitHub Sign-In</h2>
-            <p className="text-xs text-slate-400">
-              Verifying your authentication token with Supabase and preparing your dashboard...
-            </p>
+            <Loader2 className="mx-auto h-7 w-7 animate-spin text-slime-400" aria-hidden="true" />
+            <h1 className="mt-3 font-display text-lg font-semibold text-fg">Signing you in…</h1>
+            <p className="mt-1 text-xs text-fg-faint">Finishing GitHub sign-in with Supabase.</p>
           </>
         )}
       </div>

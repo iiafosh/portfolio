@@ -105,3 +105,14 @@
     display: none !important;
   }
 }
+
+/* Sequential section numbers ("01 // featured") regardless of which sections render */
+main {
+  counter-reset: section;
+}
+.numbered-section {
+  counter-increment: section;
+}
+.section-eyebrow::before {
+  content: counter(section, decimal-leading-zero) ' // ';
+}

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { FALLBACK_ITEMS, FALLBACK_PROFILE } from '@/content/fallback'
@@ -20,7 +21,7 @@ async function fetchProfile(): Promise<{ profile: Profile; source: ContentSource
   if (!isSupabaseConfigured) return { profile: FALLBACK_PROFILE, source: 'fallback' }
   const { data, error } = await supabase.from('portfolio_profile').select('*').eq('id', 1).maybeSingle()
   if (error || !data) return { profile: FALLBACK_PROFILE, source: 'fallback' }
-  return { profile: { ...FALLBACK_PROFILE, ...stripNulls(data) } as Profile, source: 'supabase' }
+  return { profile: { ...FALLBACK_PROFILE, ...data } as Profile, source: 'supabase' }
 }
 
 async function fetchItems(): Promise<{ items: PortfolioItem[]; source: ContentSource }> {
@@ -28,11 +29,6 @@ async function fetchItems(): Promise<{ items: PortfolioItem[]; source: ContentSo
   const { data, error } = await supabase.from('portfolio_items').select('*').order('sort_order', { ascending: true })
   if (error || !data || data.length === 0) return { items: FALLBACK_ITEMS, source: 'fallback' }
   return { items: data as PortfolioItem[], source: 'supabase' }
-}
-
-/** Keeps fallback values for columns that are null in the database (e.g. avatar_url). */
-function stripNulls<T extends Record<string, unknown>>(row: T): Partial<T> {
-  return Object.fromEntries(Object.entries(row).filter(([, v]) => v !== null)) as Partial<T>
 }
 
 export function useProfile() {
@@ -174,6 +170,26 @@ export function useDeleteGuestbookEntry() {
     },
     onSettled: () => qc.invalidateQueries({ queryKey: contentKeys.guestbook }),
   })
+}
+
+/**
+ * Keeps the guestbook query live: refetches when any row is inserted or deleted
+ * (Supabase Realtime, public.guestbook is in the supabase_realtime publication).
+ */
+export function useGuestbookRealtime(enabled = true) {
+  const qc = useQueryClient()
+  useEffect(() => {
+    if (!enabled || !isSupabaseConfigured) return
+    const refresh = () => qc.invalidateQueries({ queryKey: contentKeys.guestbook })
+    const channel = supabase
+      .channel(`guestbook-live-${Math.random().toString(36).slice(2)}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook' }, refresh)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'guestbook' }, refresh)
+      .subscribe()
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [enabled, qc])
 }
 
 // ---------- Visit counter ----------------------------------------------------

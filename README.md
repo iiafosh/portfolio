@@ -1,139 +1,50 @@
-# Vite + TanStack + Supabase + GitHub OAuth (Vercel Ready)
+# afosh · portfolio
 
-A modern, production-grade Single Page Application (SPA) built with:
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Frontend**: [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- **Routing**: [@tanstack/react-router](https://tanstack.com/router/latest) (declarative, type-safe client routing)
-- **Data & Caching**: [@tanstack/react-query](https://tanstack.com/query/latest) (asynchronous state management & cache invalidation)
-- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL with Row Level Security & GitHub OAuth)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Deployment**: [Vercel](https://vercel.com/) (preconfigured `vercel.json` SPA rewrite rules)
+Personal site of **Mostafa Kamal Shabara** ([@iiafosh](https://github.com/iiafosh)): AI & Software Engineering student at Horus University in Egypt, creator of [fosh&fish](https://github.com/iiafosh/fosh-and-fish).
 
----
+**Stack:** Vite · React 18 · TypeScript · TanStack Router & Query · Supabase (Postgres, RLS, GitHub OAuth, Realtime) · Tailwind CSS · Vercel
 
-## 🚀 Quick Start
+## What's in it
 
-### 1. Install Dependencies
+- **Recruiter-first home page:** who I am, what I build, resume and contact above the fold, with hover preview cards on GitHub, LinkedIn and Resume.
+- **Featured project:** fosh&fish with a lazy-loaded trailer, screenshots and a "play in browser" link.
+- **Content lives in Supabase.** Projects, experience, education, certifications, skills and the *order of sections* are rows in Postgres. Visitors can read them; only the owner can change them (RLS + `is_portfolio_owner()`).
+- **`/admin`:** an owner-only editor. Sign in with GitHub as @iiafosh to reorder sections and items, toggle visibility and edit content.
+- **Guestbook:** visitors sign in with GitHub and leave a message. Updates arrive live over Supabase Realtime. Author names come from the GitHub identity on the server, so they can't be spoofed, and each visitor can post 3 messages a day.
+- **`/resume`:** a one-page resume built from the same data. "Download PDF" prints it on A4.
+- **Rimuru slime mascot:** wanders the page and points at real things on the site every minute. You can drag it.
+- **Anghami player** and a visit counter in the footer.
+
+If Supabase is unreachable or the tables don't exist yet, the site falls back to the copy in `src/content/fallback.ts`.
+
+## Setup
+
 ```bash
 npm install
-```
-
-### 2. Configure Supabase & GitHub OAuth
-
-#### A. Create a Supabase Project
-1. Go to [supabase.com](https://supabase.com) and create a free project.
-2. In the **SQL Editor**, open and execute the SQL script in [`supabase/schema.sql`](./supabase/schema.sql). This creates the `user_items` table and enables **Row Level Security (RLS)** policies ensuring users can only read and modify their own records.
-3. In **Project Settings &rarr; API**, copy:
-   - **Project URL**
-   - **anon public API Key**
-
-#### B. Create a GitHub OAuth App
-1. Go to your GitHub account &rarr; [Settings &rarr; Developer Settings &rarr; OAuth Apps](https://github.com/settings/developers).
-2. Click **New OAuth App**:
-   - **Application name**: `Vite TanStack App`
-   - **Homepage URL**: `http://localhost:5173` (or your Vercel URL in production)
-   - **Authorization callback URL**: `https://<YOUR-SUPABASE-PROJECT-ID>.supabase.co/auth/v1/callback`
-     *(Find this in your Supabase Dashboard under Authentication &rarr; Providers &rarr; GitHub)*
-3. Click **Register Application**, then generate a **Client Secret**.
-4. In your Supabase Dashboard:
-   - Go to **Authentication &rarr; Providers &rarr; GitHub**.
-   - Toggle **Enable GitHub**.
-   - Paste your **Client ID** and **Client Secret**.
-   - Click **Save**.
-5. In Supabase Dashboard &rarr; **Authentication &rarr; URL Configuration**:
-   - Set **Site URL** to `http://localhost:5173` (or your Vercel production domain).
-   - In **Redirect URLs**, add:
-     - `http://localhost:5173/auth/callback`
-     - `https://*.vercel.app/auth/callback`
-     - `https://your-custom-domain.com/auth/callback`
-
-#### C. Setup Environment Variables
-Duplicate `.env.example` to `.env`:
-```bash
-cp .env.example .env
-```
-Fill in your Supabase credentials:
-```env
-VITE_SUPABASE_URL=https://<your-project-id>.supabase.co
-VITE_SUPABASE_ANON_KEY=<your-anon-key>
-```
-
----
-
-### 3. Run Locally
-```bash
+cp .env.example .env   # fill VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
 
----
+### Supabase
 
-## 🌐 Deploying to Vercel
+1. Open the Supabase SQL Editor and run [`supabase/portfolio.sql`](supabase/portfolio.sql). It's idempotent, so you can run it again; seed rows are only inserted when missing.
+2. Under **Authentication → Providers → GitHub**, enable GitHub with the Client ID and Secret from a GitHub OAuth app. The app's callback URL is `https://<project>.supabase.co/auth/v1/callback`.
+3. Under **Authentication → URL Configuration**, set the Site URL to the production domain and add these redirect URLs: `http://localhost:5173/auth/callback` and `https://<your-domain>/auth/callback`.
 
-### Step 1: Push Code to GitHub
-Initialize git and push to your GitHub repository:
-```bash
-git init
-git add .
-git commit -m "feat: Vite + TanStack + Supabase + Vercel setup"
-git branch -M main
-git remote add origin https://github.com/<your-username>/<your-repo-name>.git
-git push -u origin main
-```
+The owner is identified by GitHub user id `256016032` (@iiafosh) in `is_portfolio_owner()`.
 
-### Step 2: Import into Vercel
-1. Log in to [vercel.com](https://vercel.com) and click **Add New &rarr; Project**.
-2. Select your repository.
-3. Under **Environment Variables**, add:
-   - `VITE_SUPABASE_URL`: Your Supabase Project URL
-   - `VITE_SUPABASE_ANON_KEY`: Your Supabase Anon Key
-4. Click **Deploy**.
+### Deploy (Vercel)
 
-> **Note on Client-Side Routing:**
-> The included [`vercel.json`](./vercel.json) handles SPA rewrites so direct navigation and browser refreshing on deep routes (e.g. `/dashboard`, `/auth/callback`) work seamlessly without 404 errors.
+Import the repo and add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables. `vercel.json` rewrites all routes to the SPA.
 
----
-
-## 📁 Project Structure
+## Project layout
 
 ```
-├── .env.example             # Supabase environment variables template
-├── index.html               # Vite HTML entry point (Geist & Silkscreen fonts)
-├── package.json             # Dependencies and scripts
-├── postcss.config.js        # PostCSS configuration
-├── tailwind.config.js       # Tailwind CSS configuration
-├── tsconfig.json            # TypeScript configuration
-├── vercel.json              # Vercel SPA routing rewrite rules
-├── vite.config.ts           # Vite configuration with '@/' path aliases
-├── supabase/
-│   └── schema.sql           # PostgreSQL table definitions and RLS policies
-└── src/
-    ├── main.tsx             # App root (QueryClientProvider + AuthProvider + RouterProvider)
-    ├── router.tsx           # TanStack Router configuration and route tree
-    ├── index.css            # Tailwind & yust.dev liquid dock and noise styles
-    ├── lib/
-    │   └── supabase.ts      # Supabase client initialization & types
-    ├── context/
-    │   └── AuthContext.tsx  # Auth state, session persistence, GitHub OAuth triggers
-    ├── components/
-    │   ├── Dock.tsx         # yust.dev liquid-glass floating pill dock
-    │   └── icons/
-    │       ├── GithubIcon.tsx   # GitHub SVG icon
-    │       └── LinkedInIcon.tsx # LinkedIn SVG icon
-    └── pages/
-        ├── AboutPage.tsx    # Bio, HUE details, live Cairo clock, socials
-        ├── ProjectsPage.tsx # Shipped builds and tech stack tags
-        ├── HacksPage.tsx    # Hackathon podium finishes and sprint builds
-        ├── CertsPage.tsx    # Academic achievements & verified certifications
-        ├── DatabasePage.tsx # Supabase PostgreSQL playground with live RLS & GitHub OAuth
-        ├── AuthCallback.tsx # OAuth callback listener and redirect
-        └── NotFound.tsx     # 404 page
+supabase/portfolio.sql      schema, RLS, triggers, seed
+src/content/                types + local fallback content
+src/lib/content.ts          React Query hooks (read, owner edits, guestbook, views)
+src/context/AuthContext.tsx GitHub OAuth session + isOwner
+src/sections/               home page sections (rendered in profile.section_order)
+src/pages/                  Home, Resume, Admin, AuthCallback, NotFound
+src/components/             layout, dock, hover cards, mascot, Anghami player
 ```
-
----
-
-## 🛠️ Available Scripts
-
-- `npm run dev`: Starts local Vite development server at `http://localhost:5173`.
-- `npm run build`: Type-checks with `tsc -b` and compiles for production with `vite build`.
-- `npm run preview`: Previews the production build locally.
