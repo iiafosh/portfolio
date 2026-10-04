@@ -132,15 +132,6 @@ export function buildShowcaseItems(profile: Profile, items: PortfolioItem[]): Sh
     })
   }
 
-  if (order.has('guestbook')) {
-    out.push({
-      id: 'guestbook',
-      category: 'Guestbook',
-      title: 'Sign the guestbook!',
-      description: 'Sign in with GitHub and leave a note. It shows up live.',
-      link: { type: 'section', id: 'guestbook', label: 'Sign it' },
-    })
-  }
 
   out.push({
     id: 'resume',
@@ -150,13 +141,6 @@ export function buildShowcaseItems(profile: Profile, items: PortfolioItem[]): Sh
     link: { type: 'route', to: '/resume', label: 'Open resume' },
   })
 
-  out.push({
-    id: 'music',
-    category: 'Music',
-    title: 'On repeat on Anghami',
-    description: 'There is a player at the bottom of the page.',
-    link: { type: 'external', href: profile.anghami_url ?? 'https://play.anghami.com', label: 'Open Anghami' },
-  })
 
   return [...out, ...SLIME_TIPS, ...EXCLUSIVE_SHOWCASE_ITEMS]
 }

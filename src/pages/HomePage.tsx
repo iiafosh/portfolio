@@ -9,10 +9,8 @@ import { ExperienceSection } from '@/sections/Experience'
 import { EducationSection } from '@/sections/Education'
 import { SkillsSection } from '@/sections/Skills'
 import { CertificationsSection } from '@/sections/Certifications'
-import { GuestbookSection } from '@/sections/Guestbook'
 
-// Each section renders null when it has no content, so empty LinkedIn-only
-// sections disappear until data is added in Supabase.
+// Each section renders null when it has no content.
 const SECTIONS: Record<SectionKey, React.FC> = {
   featured: FeaturedSection,
   achievements: AchievementsSection,
@@ -21,7 +19,6 @@ const SECTIONS: Record<SectionKey, React.FC> = {
   education: EducationSection,
   skills: SkillsSection,
   certifications: CertificationsSection,
-  guestbook: GuestbookSection,
 }
 
 export const HomePage: React.FC = () => {

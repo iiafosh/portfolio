@@ -1,11 +1,9 @@
 import type { PortfolioItem, Profile } from './types'
 
-// Local copy of the portfolio content. The site renders this when Supabase is
-// unreachable or the portfolio tables have not been created yet. Keep it in
-// sync with supabase/portfolio.sql (seed) and supabase/content.sql (latest).
+// All portfolio content. Edit here; there is no backend.
 // Sources: LinkedIn profile + posts (2026-10) and the GitHub repos.
 
-export const FALLBACK_PROFILE: Profile = {
+export const PROFILE: Profile = {
   name: 'Mostafa Kamal Shabara',
   short_name: 'Mostafa',
   handle: 'afosh',
@@ -17,9 +15,8 @@ export const FALLBACK_PROFILE: Profile = {
   availability: 'Open to internships & freelance',
   github_url: 'https://github.com/iiafosh',
   linkedin_url: 'https://www.linkedin.com/in/mostafa-kamal-3731453a9/',
-  anghami_url: null,
-  avatar_url: null,
-  section_order: ['featured', 'achievements', 'projects', 'experience', 'education', 'skills', 'certifications', 'guestbook'],
+  avatar_url: '/media/avatar.jpg',
+  section_order: ['featured', 'achievements', 'projects', 'experience', 'education', 'skills', 'certifications'],
 }
 
 const base = {
@@ -39,7 +36,7 @@ const base = {
 
 const LINKEDIN = 'https://www.linkedin.com/in/mostafa-kamal-3731453a9/recent-activity/all/'
 
-export const FALLBACK_ITEMS: PortfolioItem[] = [
+export const ITEMS: PortfolioItem[] = [
   // Projects
   {
     ...base,
@@ -80,6 +77,7 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     ],
     tags: ['Mobile app', 'Web', 'Sustainability', 'Team of 3'],
     url: LINKEDIN,
+    image_url: '/media/respark.jpg',
     sort_order: 20,
   },
   {
@@ -98,6 +96,7 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     ],
     tags: ['ESP32', 'Arduino', 'LoRa', 'Sensors', 'IoT dashboard'],
     url: LINKEDIN,
+    image_url: '/media/damietta-hackathon.jpg',
     sort_order: 30,
   },
   {
@@ -153,8 +152,8 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     subtitle: 'Full-stack web app',
     period: '2026',
     description:
-      'Content, ordering and the guestbook live in Supabase Postgres behind Row Level Security, with GitHub sign-in and an owner-only editor.',
-    tags: ['React', 'TypeScript', 'TanStack', 'Supabase', 'Tailwind'],
+      'A fast static React site with a wandering slime mascot, hover preview cards and a print-ready resume generated from the same data.',
+    tags: ['React', 'TypeScript', 'TanStack Router', 'Tailwind', 'Vite'],
     repo_url: 'https://github.com/iiafosh/portfolio',
     sort_order: 70,
   },
@@ -201,22 +200,24 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     kind: 'experience',
     title: 'Competitive programmer',
     subtitle: 'ICPC HUE community',
-    period: '2026 — Present',
+    period: 'Jan 2026 — Present',
     location: 'Horus University',
     description: 'Training with one of the community’s 16 teams on algorithms and data structures for ICPC-style contests.',
     highlights: ['Team ranked #1 at Horus in the ECPC qualifiers'],
     tags: ['C++', 'Algorithms', 'Problem solving'],
-    sort_order: 10,
+    sort_order: 20,
   },
   {
     ...base,
     id: 'exp-axis',
     kind: 'experience',
-    title: 'Member',
-    subtitle: 'AXIS student club',
-    period: 'Present',
-    location: 'Horus University',
-    sort_order: 20,
+    title: 'Member of Technical Staff',
+    subtitle: 'AXIS student club · Horus University',
+    period: 'Dec 2025 — Present',
+    location: 'New Damietta · Hybrid',
+    description: 'Technical member of AXIS, one of the student clubs at the Faculty of AI.',
+    tags: ['Python'],
+    sort_order: 10,
   },
 
   // Education
@@ -226,8 +227,10 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     kind: 'education',
     title: 'Horus University in Egypt (HUE)',
     subtitle: 'Faculty of Artificial Intelligence · AI & Informatics (Robotics)',
-    period: '2025 — Present',
+    period: 'Sep 2025 — Present',
     location: 'New Damietta, Egypt',
+    description: 'Finished Level 1. Course projects include NumLab (numerical methods) and Robo-Space (machine learning).',
+    highlights: ['Activities: AXIS and AISU student clubs, ICPC HUE community'],
     url: 'https://horus.edu.eg',
     sort_order: 10,
   },
@@ -270,7 +273,7 @@ export const FALLBACK_ITEMS: PortfolioItem[] = [
     id: 'skill-web',
     kind: 'skill_group',
     title: 'Web & apps',
-    tags: ['React', 'Vite', 'TanStack', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Tkinter / CustomTkinter'],
+    tags: ['React', 'Vite', 'TanStack', 'Tailwind CSS', 'Tkinter / CustomTkinter'],
     sort_order: 50,
   },
   {

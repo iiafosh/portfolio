@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
-import { AuthProvider } from '@/context/AuthContext'
 import { router } from '@/router'
 import './index.css'
 
@@ -23,9 +22,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <RouterProvider router={router} />
-        </AuthProvider>
+        <RouterProvider router={router} />
       </QueryClientProvider>
     </React.StrictMode>
   )

@@ -3,7 +3,6 @@ import { Link } from '@tanstack/react-router'
 import { Check, Copy, FileText, MapPin } from 'lucide-react'
 import { GithubIcon } from '@/components/icons/GithubIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
-import { AnghamiIcon } from '@/components/icons/AnghamiIcon'
 import { GitHubCard, HoverCard, HoverCardGroup, LinkedInCard, ResumeCard } from '@/components/hovercards'
 import { useItemsOfKind, useProfile } from '@/lib/content'
 import type { PortfolioItem, Profile } from '@/content/types'
@@ -177,18 +176,6 @@ export const HeroSection: React.FC = () => {
                 <LinkedInIcon className="h-[18px] w-[18px]" />
               </a>
             </HoverCard>
-
-            {profile.anghami_url && (
-              <a
-                href={profile.anghami_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="icon-btn"
-                aria-label="What I listen to on Anghami (opens in a new tab)"
-              >
-                <AnghamiIcon className="h-[18px] w-[18px]" />
-              </a>
-            )}
           </div>
         </div>
 

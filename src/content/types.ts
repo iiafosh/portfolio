@@ -1,4 +1,4 @@
-// Shared content model. Mirrors the tables in supabase/portfolio.sql.
+// Shared content model for src/content/data.ts.
 
 export type SectionKey =
   | 'featured'
@@ -8,7 +8,6 @@ export type SectionKey =
   | 'education'
   | 'skills'
   | 'certifications'
-  | 'guestbook'
 
 export const ALL_SECTIONS: SectionKey[] = [
   'featured',
@@ -18,7 +17,6 @@ export const ALL_SECTIONS: SectionKey[] = [
   'education',
   'skills',
   'certifications',
-  'guestbook',
 ]
 
 export const SECTION_LABELS: Record<SectionKey, string> = {
@@ -29,7 +27,6 @@ export const SECTION_LABELS: Record<SectionKey, string> = {
   education: 'Education',
   skills: 'Skills',
   certifications: 'Certifications',
-  guestbook: 'Guestbook',
 }
 
 export interface Profile {
@@ -43,7 +40,6 @@ export interface Profile {
   availability: string | null
   github_url: string
   linkedin_url: string
-  anghami_url: string | null
   avatar_url: string | null
   /** Order the home page sections render in. Sections not listed are hidden. */
   section_order: SectionKey[]
@@ -79,12 +75,3 @@ export interface PortfolioItem {
   visible: boolean
 }
 
-export interface GuestbookEntry {
-  id: string
-  user_id: string
-  github_username: string | null
-  display_name: string | null
-  avatar_url: string | null
-  message: string
-  created_at: string
-}

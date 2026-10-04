@@ -1,20 +1,16 @@
 {
-  "name": "vite-tanstack-supabase-vercel",
+  "name": "afosh-portfolio",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "content:sql": "node --experimental-strip-types scripts/gen-content-sql.ts"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.1",
     "@tanstack/react-query": "^5.69.0",
     "@tanstack/react-router": "^1.114.15",
-    "@types/canvas-confetti": "^1.9.0",
-    "canvas-confetti": "^1.9.4",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

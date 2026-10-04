@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { FileText, Menu, Shield, X } from 'lucide-react'
+import { FileText, Menu, X } from 'lucide-react'
 import rimuruSlimeImg from '@/assets/rimuru-slime.png'
-import { useAuth } from '@/context/AuthContext'
 import { useItems, useProfile } from '@/lib/content'
 import type { SectionKey } from '@/content/types'
 
@@ -35,7 +34,6 @@ function useNavLinks(): NavLink[] {
       links.push({ id: 'experience', label: 'Experience', match: ['experience'] })
     }
     if (order.has('skills') && has('skill_group')) links.push({ id: 'skills', label: 'Skills', match: ['skills'] })
-    if (order.has('guestbook')) links.push({ id: 'guestbook', label: 'Guestbook', match: ['guestbook'] })
 
     // Keep the dock in the same order the page renders.
     const pos = (id: SectionKey) => profile.section_order.indexOf(id)
@@ -96,7 +94,6 @@ function useScrollSpy(ids: string[], enabled: boolean): string | null {
 
 export const Dock: React.FC = () => {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
-  const { isOwner } = useAuth()
   const links = useNavLinks()
   const onHome = pathname === '/'
   const { profile } = useProfile()
@@ -195,18 +192,6 @@ export const Dock: React.FC = () => {
             <FileText className="h-3.5 w-3.5" aria-hidden="true" />
             Resume
           </Link>
-
-          {isOwner && (
-            <Link
-              to="/admin"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-fg-muted transition-colors hover:bg-white/[0.05] hover:text-fg"
-              activeProps={{ className: '!text-slime-200 bg-slime-400/10' }}
-              aria-label="Admin"
-            >
-              <Shield className="h-3.5 w-3.5" aria-hidden="true" />
-              <span className="hidden sm:inline">Admin</span>
-            </Link>
-          )}
 
           {links.length > 0 && (
             <button
