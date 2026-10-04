@@ -1,6 +1,11 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "portfolio", "runtimeExecutable": "npm.cmd", "runtimeArgs": ["run", "dev"], "port": 5173 }
+    {
+      "name": "afosh-portfolio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "3210"],
+      "port": 3210
+    }
   ]
 }
