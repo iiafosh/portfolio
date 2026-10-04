@@ -6,6 +6,7 @@ import { buildShowcaseItems, type ShowcaseItem } from './showcase'
 import { SlimeSprite } from './SlimeSprite'
 import { SlimeEngine, TOP_SAFE } from './engine'
 import { SPRITE_ASPECT, getFaceRig } from './rig'
+import { COLOR_FADE, SLIME_GLOW, SLIME_HI, SLIME_MID, SLIME_TINT, alpha, mix } from './skin'
 
 // Rimuru, the desktop-pet mascot. A little SVG slime with a behaviour state
 // machine (see engine.ts): it hops around, does zoomies, chases the cursor,
@@ -66,16 +67,47 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+// Every slime-colored bit reads the skin's --slime-* variables (skin.ts).
 const ORB_STYLE: React.CSSProperties = {
   opacity: 0,
-  background:
-    'radial-gradient(circle, #ffffff 0%, #b5ecff 38%, rgba(79,200,255,0.65) 68%, rgba(79,200,255,0) 100%)',
-  boxShadow: '0 0 10px 3px rgba(79,200,255,0.55)',
+  background: `radial-gradient(circle, #ffffff 0%, ${SLIME_TINT} 38%, ${alpha(SLIME_MID, 65)} 68%, ${alpha(SLIME_MID, 0)} 100%)`,
+  boxShadow: `0 0 10px 3px ${alpha(SLIME_MID, 55)}`,
 }
-const HIDDEN_FX: React.CSSProperties = { opacity: 0 }
-const DROP_STYLE: React.CSSProperties = { opacity: 0, width: 4, height: 4 }
+const Z_STYLE: React.CSSProperties = { opacity: 0, color: SLIME_TINT }
+const DROP_STYLE: React.CSSProperties = {
+  opacity: 0,
+  width: 4,
+  height: 4,
+  background: SLIME_TINT,
+  boxShadow: `0 0 6px ${alpha(SLIME_MID, 80)}`,
+}
+const GLOW_STYLE: React.CSSProperties = {
+  opacity: 0,
+  backgroundColor: alpha(SLIME_MID, 50),
+  transition: `background-color ${COLOR_FADE}`,
+}
+const BANG_STYLE: React.CSSProperties = {
+  opacity: 0,
+  color: SLIME_TINT,
+  textShadow: `0 0 8px ${alpha(SLIME_MID, 90)}`,
+}
+const SPRITE_STYLE: React.CSSProperties = {
+  filter: `drop-shadow(0 3px 8px ${SLIME_GLOW})`,
+  transition: `filter ${COLOR_FADE}`,
+}
 const BODY_STYLE: React.CSSProperties = { transformOrigin: '50% 100%' }
 const SHADOW_STYLE: React.CSSProperties = { transform: 'translateX(-50%)' }
+
+// Speech bubble: neutral dark surface (Catppuccin-like site palette) with a
+// skin-colored accent border and eyebrow.
+const BUBBLE_BORDER = alpha(SLIME_MID, 35)
+const BUBBLE_ACCENT = mix(SLIME_MID, 55, SLIME_HI)
+const BUBBLE_STYLE: React.CSSProperties = {
+  borderColor: BUBBLE_BORDER,
+  transition: `border-color ${COLOR_FADE}`,
+}
+const TAIL_STYLE: React.CSSProperties = { borderColor: BUBBLE_BORDER, transition: `border-color ${COLOR_FADE}` }
+const ACCENT_STYLE: React.CSSProperties = { color: BUBBLE_ACCENT, transition: `color ${COLOR_FADE}` }
 
 export const SlimeMascot: React.FC = () => {
   const { profile } = useProfile()
@@ -282,7 +314,7 @@ export const SlimeMascot: React.FC = () => {
           <span
             key={`d${i}`}
             data-fx="drop"
-            className="absolute left-0 top-0 rounded-full bg-slime-200 shadow-[0_0_6px_rgba(79,200,255,0.8)] will-change-transform"
+            className="absolute left-0 top-0 rounded-full will-change-transform"
             style={DROP_STYLE}
           />
         ))}
@@ -290,8 +322,8 @@ export const SlimeMascot: React.FC = () => {
           <span
             key={`z${i}`}
             data-fx="z"
-            className="absolute left-0 top-0 font-pixel text-[10px] leading-none text-slime-200 will-change-transform"
-            style={HIDDEN_FX}
+            className="absolute left-0 top-0 font-pixel text-[10px] leading-none will-change-transform"
+            style={Z_STYLE}
           >
             z
           </span>
@@ -311,8 +343,9 @@ export const SlimeMascot: React.FC = () => {
               onMouseLeave={onBubbleLeave}
               onFocus={onBubbleEnter}
               onBlur={onBubbleLeave}
-              className="pointer-events-auto absolute animate-pop-in rounded-2xl border border-slime-400/25 bg-ink-850/95 p-3.5 pr-3 shadow-card backdrop-blur-md"
+              className="pointer-events-auto absolute animate-pop-in rounded-2xl border bg-[#1e1e2e]/95 p-3.5 pr-3 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_18px_48px_-24px_rgba(0,0,0,0.8)] backdrop-blur-md"
               style={{
+                ...BUBBLE_STYLE,
                 width: placement.width,
                 left: placement.left,
                 ...(placement.above ? { bottom: spriteH + BUBBLE_GAP } : { top: spriteH + BUBBLE_GAP }),
@@ -320,24 +353,28 @@ export const SlimeMascot: React.FC = () => {
             >
               <span
                 aria-hidden="true"
-                className={`absolute h-3 w-3 rotate-45 border-slime-400/25 bg-ink-850 ${
+                className={`absolute h-3 w-3 rotate-45 bg-[#1e1e2e] ${
                   placement.above ? '-bottom-1.5 border-b border-r' : '-top-1.5 border-l border-t'
                 }`}
-                style={{ left: placement.tail - 6 }}
+                style={{ ...TAIL_STYLE, left: placement.tail - 6 }}
               />
               <div className="flex items-start justify-between gap-2">
-                <p className="font-pixel text-[10px] uppercase tracking-[0.16em] text-slime-300">{active.category}</p>
+                <p className="font-pixel text-[10px] uppercase tracking-[0.16em]" style={ACCENT_STYLE}>
+                  {active.category}
+                </p>
                 <button
                   type="button"
                   onClick={dismiss}
                   aria-label="Dismiss message"
-                  className="-mr-1 -mt-1.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-fg-faint transition-colors hover:bg-white/[0.06] hover:text-fg"
+                  className="-mr-1 -mt-1.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-faint transition-colors hover:bg-white/[0.06] hover:text-text"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               </div>
-              <p className="-mt-1 font-display text-sm font-semibold leading-snug text-fg">{active.title}</p>
-              {active.description && <p className="mt-1 text-xs leading-relaxed text-fg-muted">{active.description}</p>}
+              <p className="-mt-1 font-display text-sm font-semibold leading-snug text-[#cdd6f4]">{active.title}</p>
+              {active.description && (
+                <p className="mt-1 text-xs leading-relaxed text-[#a6adc8]">{active.description}</p>
+              )}
               {active.link && <BubbleLink link={active.link} onNavigate={dismiss} />}
             </div>
           )}
@@ -361,18 +398,15 @@ export const SlimeMascot: React.FC = () => {
           <div ref={bodyRef} className="pointer-events-none relative h-full w-full will-change-transform" style={BODY_STYLE}>
             <div
               ref={glowRef}
-              className="absolute inset-[-20%] rounded-full bg-slime-300/50 blur-md"
-              style={HIDDEN_FX}
+              className="absolute inset-[-20%] rounded-full blur-md"
+              style={GLOW_STYLE}
             />
-            <SlimeSprite
-              ref={svgRef}
-              className="relative h-full w-full overflow-visible drop-shadow-[0_3px_8px_rgba(79,200,255,0.35)]"
-            />
+            <SlimeSprite ref={svgRef} className="relative h-full w-full overflow-visible" style={SPRITE_STYLE} />
           </div>
           <span
             ref={bangRef}
-            className="pointer-events-none absolute bottom-full left-1/2 font-hero text-base font-black leading-none text-slime-200 [text-shadow:0_0_8px_rgba(79,200,255,0.9)]"
-            style={HIDDEN_FX}
+            className="pointer-events-none absolute bottom-full left-1/2 font-hero text-base font-black leading-none"
+            style={BANG_STYLE}
           >
             !
           </span>
@@ -382,8 +416,13 @@ export const SlimeMascot: React.FC = () => {
   )
 }
 
+// Skin accent, brightening toward the skin's highlight on hover / focus.
 const linkClass =
-  'mt-2.5 inline-flex items-center gap-1 font-mono text-xs font-medium text-slime-300 transition-colors hover:text-slime-100'
+  'mt-2.5 inline-flex items-center gap-1 font-mono text-xs font-medium text-[color:var(--bubble-link)] transition-colors hover:text-[color:var(--bubble-link-hover)]'
+const LINK_STYLE = {
+  '--bubble-link': BUBBLE_ACCENT,
+  '--bubble-link-hover': mix(SLIME_HI, 75, '#ffffff'),
+} as React.CSSProperties
 
 const BubbleLink: React.FC<{ link: NonNullable<ShowcaseItem['link']>; onNavigate: () => void }> = ({
   link,
@@ -391,7 +430,14 @@ const BubbleLink: React.FC<{ link: NonNullable<ShowcaseItem['link']>; onNavigate
 }) => {
   if (link.type === 'external') {
     return (
-      <a href={link.href} target="_blank" rel="noopener noreferrer" onClick={onNavigate} className={linkClass}>
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onNavigate}
+        className={linkClass}
+        style={LINK_STYLE}
+      >
         {link.label}
         <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
         <span className="sr-only">(opens in a new tab)</span>
@@ -400,7 +446,7 @@ const BubbleLink: React.FC<{ link: NonNullable<ShowcaseItem['link']>; onNavigate
   }
   if (link.type === 'route') {
     return (
-      <Link to={link.to} onClick={onNavigate} className={linkClass}>
+      <Link to={link.to} onClick={onNavigate} className={linkClass} style={LINK_STYLE}>
         {link.label} →
       </Link>
     )
@@ -418,6 +464,7 @@ const BubbleLink: React.FC<{ link: NonNullable<ShowcaseItem['link']>; onNavigate
         }
       }}
       className={linkClass}
+      style={LINK_STYLE}
     >
       {link.label} →
     </Link>

@@ -15,7 +15,6 @@ import { Section } from '@/components/ui/Section'
 import { GithubIcon } from '@/components/icons/GithubIcon'
 import { useItemsOfKind, useProfile } from '@/lib/content'
 import { hash, isLinkedIn, pickFeatured } from '@/lib/derive'
-import { revealDelay } from '@/lib/reveal'
 import { trackSpotlight } from '@/lib/spotlight'
 import type { PortfolioItem } from '@/content/types'
 
@@ -80,35 +79,35 @@ const GenerativeArt: React.FC<{ item: PortfolioItem; className?: string }> = ({ 
   const initial = item.title.replace(/^this\s+/i, '').charAt(0).toUpperCase()
 
   return (
-    <div aria-hidden="true" className={`relative overflow-hidden bg-ink-850 ${className}`}>
+    <div aria-hidden="true" className={`relative overflow-hidden bg-surface ${className}`}>
       <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
         <defs>
           {pattern === 'dots' && (
             <pattern id={`p-${uid}`} width="16" height="16" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1.1" fill="rgba(134,220,255,0.28)" />
+              <circle cx="2" cy="2" r="1.1" style={{ fill: 'rgb(var(--accent) / 0.28)' }} />
             </pattern>
           )}
           {pattern === 'grid' && (
             <pattern id={`p-${uid}`} width="24" height="24" patternUnits="userSpaceOnUse">
-              <path d="M24 0H0V24" fill="none" stroke="rgba(134,220,255,0.14)" strokeWidth="1" />
+              <path d="M24 0H0V24" fill="none" style={{ stroke: 'rgb(var(--accent) / 0.14)' }} strokeWidth="1" />
             </pattern>
           )}
           {pattern === 'waves' && (
             <pattern id={`p-${uid}`} width="48" height="14" patternUnits="userSpaceOnUse">
-              <path d="M0 7 Q12 0 24 7 T48 7" fill="none" stroke="rgba(134,220,255,0.2)" strokeWidth="1.2" />
+              <path d="M0 7 Q12 0 24 7 T48 7" fill="none" style={{ stroke: 'rgb(var(--accent) / 0.2)' }} strokeWidth="1.2" />
             </pattern>
           )}
           {pattern === 'circuit' && (
             <pattern id={`p-${uid}`} width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M0 10H14L20 16V40M40 28H28L24 24V0" fill="none" stroke="rgba(134,220,255,0.16)" strokeWidth="1" />
-              <circle cx="20" cy="16" r="1.8" fill="rgba(134,220,255,0.35)" />
-              <circle cx="24" cy="24" r="1.8" fill="rgba(134,220,255,0.35)" />
+              <path d="M0 10H14L20 16V40M40 28H28L24 24V0" fill="none" style={{ stroke: 'rgb(var(--accent) / 0.16)' }} strokeWidth="1" />
+              <circle cx="20" cy="16" r="1.8" style={{ fill: 'rgb(var(--accent) / 0.35)' }} />
+              <circle cx="24" cy="24" r="1.8" style={{ fill: 'rgb(var(--accent) / 0.35)' }} />
             </pattern>
           )}
           <radialGradient id={`g-${uid}`} cx={`${glowX}%`} cy={`${glowY}%`} r="70%">
-            <stop offset="0%" stopColor="rgba(79,200,255,0.30)" />
-            <stop offset="60%" stopColor="rgba(79,200,255,0.04)" />
-            <stop offset="100%" stopColor="rgba(79,200,255,0)" />
+            <stop offset="0%" style={{ stopColor: 'rgb(var(--accent) / 0.30)' }} />
+            <stop offset="60%" style={{ stopColor: 'rgb(var(--accent) / 0.04)' }} />
+            <stop offset="100%" style={{ stopColor: 'rgb(var(--accent) / 0)' }} />
           </radialGradient>
           <linearGradient id={`f-${uid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#fff" stopOpacity="1" />
@@ -125,12 +124,12 @@ const GenerativeArt: React.FC<{ item: PortfolioItem; className?: string }> = ({ 
       {/* Ghost initial */}
       <span
         className="absolute -bottom-6 right-3 select-none font-hero text-[7.5rem] font-black leading-none text-transparent"
-        style={{ WebkitTextStroke: '1px rgba(134,220,255,0.18)' }}
+        style={{ WebkitTextStroke: '1px rgb(var(--accent) / 0.18)' }}
       >
         {initial}
       </span>
 
-      <span className="absolute left-5 top-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-slime-400/30 bg-ink-950/60 text-slime-200 shadow-[0_10px_30px_-10px_rgba(79,200,255,0.5)] backdrop-blur transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-[-4deg]">
+      <span className="absolute left-5 top-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-accent/30 bg-bg/60 text-accent shadow-[0_10px_30px_-10px_rgb(var(--accent)/0.5)] backdrop-blur transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-[-4deg]">
         <Icon className="h-6 w-6" strokeWidth={1.75} />
       </span>
     </div>
@@ -142,7 +141,7 @@ const GenerativeArt: React.FC<{ item: PortfolioItem; className?: string }> = ({ 
 /* ------------------------------------------------------------------ */
 
 const linkClass =
-  'inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 -mx-2 text-sm font-medium text-fg-muted transition-colors hover:text-slime-200'
+  'inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 -mx-2 text-sm font-medium text-muted transition-colors hover:text-accent'
 
 /** Portrait photos (e.g. ReSpark) look best cropped tall in a side panel. */
 const PORTRAIT_HINT = /respark/i
@@ -157,12 +156,7 @@ const FOCAL_POINTS: [RegExp, string][] = [
   [/damietta/i, '50% 100%'],
 ]
 
-const ProjectCard: React.FC<{ item: PortfolioItem; wide: boolean; className: string; index: number }> = ({
-  item,
-  wide,
-  className,
-  index,
-}) => {
+const ProjectCard: React.FC<{ item: PortfolioItem; wide: boolean; className: string }> = ({ item, wide, className }) => {
   const portrait = !!item.image_url && PORTRAIT_HINT.test(item.image_url)
   const media = item.image_url ? (
     <img
@@ -180,8 +174,7 @@ const ProjectCard: React.FC<{ item: PortfolioItem; wide: boolean; className: str
   return (
     <article
       onPointerMove={trackSpotlight}
-      style={revealDelay(index)}
-      className={`reveal spotlight card card-hover group flex flex-col overflow-hidden ${
+      className={`spotlight card card-hover group flex flex-col overflow-hidden ${
         wide ? 'sm:flex-row' : ''
       } ${className}`}
     >
@@ -196,17 +189,17 @@ const ProjectCard: React.FC<{ item: PortfolioItem; wide: boolean; className: str
       >
         {media}
         {item.image_url && (
-          <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950/50 via-transparent to-transparent" />
+          <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg/50 via-transparent to-transparent" />
         )}
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="font-display text-xl font-semibold tracking-tight text-fg">{item.title}</h3>
-          {item.period && <span className="shrink-0 font-mono text-xs text-fg-faint">{item.period}</span>}
+          <h3 className="font-display text-xl font-semibold tracking-tight text-text">{item.title}</h3>
+          {item.period && <span className="shrink-0 font-mono text-xs text-faint">{item.period}</span>}
         </div>
-        {item.subtitle && <p className="mt-1 text-sm text-slime-300">{item.subtitle}</p>}
-        {item.description && <p className="mt-3 text-sm leading-relaxed text-fg-muted">{item.description}</p>}
+        {item.subtitle && <p className="mt-1 text-sm font-medium text-muted">{item.subtitle}</p>}
+        {item.description && <p className="mt-3 text-sm leading-relaxed text-muted">{item.description}</p>}
 
         {item.highlights.length > 0 && (
           <ul className="ticks mt-4 space-y-1.5">
@@ -281,7 +274,6 @@ export const ProjectsSection: React.FC = () => {
           <ProjectCard
             key={item.id}
             item={item}
-            index={i}
             // Horizontal layout (from sm up) only when the card is wide in both grids.
             wide={sm[i]! > 1 && lg[i]! > 1}
             className={`${SM_SPAN[sm[i]!] ?? ''} ${LG_SPAN[lg[i]!] ?? ''}`}

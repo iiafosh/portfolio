@@ -16,7 +16,8 @@ export const PROFILE: Profile = {
   github_url: 'https://github.com/iiafosh',
   linkedin_url: 'https://www.linkedin.com/in/mostafa-kamal-3731453a9/',
   avatar_url: '/media/avatar.jpg',
-  section_order: ['featured', 'achievements', 'projects', 'experience', 'education', 'skills', 'certifications'],
+  // 'experience' renders work and education as two tabs.
+  section_order: ['featured', 'achievements', 'projects', 'experience', 'skills', 'certifications'],
 }
 
 const base = {

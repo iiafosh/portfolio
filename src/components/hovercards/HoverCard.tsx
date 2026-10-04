@@ -238,8 +238,8 @@ export const HoverCardSurface: React.FC<{ children: React.ReactNode; className?:
   className = '',
 }) => (
   <div
-    className={`relative overflow-hidden rounded-2xl border border-slime-400/20 text-left shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_24px_60px_-20px_rgba(0,0,0,0.95),0_0_40px_-18px_rgba(79,200,255,0.45)] ring-1 ring-black/50 ${className}`}
-    style={{ background: 'linear-gradient(180deg, #111829 0%, #0a0e19 70%)' }}
+    className={`relative overflow-hidden rounded-2xl border border-line-strong text-left shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_24px_60px_-20px_rgba(0,0,0,0.95),0_0_40px_-18px_rgb(var(--accent)/0.45)] ring-1 ring-black/50 ${className}`}
+    style={{ background: 'linear-gradient(180deg, rgb(var(--surface)) 0%, rgb(var(--bg)) 75%)' }}
   >
     {children}
   </div>

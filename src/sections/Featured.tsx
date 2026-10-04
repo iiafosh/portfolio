@@ -56,9 +56,9 @@ export const FeaturedSection: React.FC = () => {
 
   return (
     <Section id="featured" eyebrow="featured" title="Latest release">
-      <article className="reveal card overflow-hidden rounded-3xl">
+      <article className="card overflow-hidden rounded-3xl">
         {/* Stage */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-ink-850 sm:aspect-video">
+        <div className="relative aspect-[4/3] overflow-hidden bg-surface sm:aspect-video">
           {playing && item.video_url ? (
             <video
               className="h-full w-full bg-black object-contain"
@@ -96,7 +96,7 @@ export const FeaturedSection: React.FC = () => {
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    'radial-gradient(120% 95% at 0% 0%, rgba(6,8,15,0.94) 0%, rgba(6,8,15,0.7) 30%, rgba(6,8,15,0) 62%), linear-gradient(to top, rgba(6,8,15,0.55), rgba(6,8,15,0) 30%)',
+                    'radial-gradient(120% 95% at 0% 0%, rgb(var(--bg) / 0.94) 0%, rgb(var(--bg) / 0.7) 30%, rgb(var(--bg) / 0) 62%), linear-gradient(to top, rgb(var(--bg) / 0.55), rgb(var(--bg) / 0) 30%)',
                 }}
               />
 
@@ -110,14 +110,14 @@ export const FeaturedSection: React.FC = () => {
                   <span className="relative flex h-16 w-16 items-center justify-center sm:h-24 sm:w-24">
                     <span
                       aria-hidden="true"
-                      className="absolute inset-0 rounded-full bg-slime-400/25 transition-transform duration-500 group-hover:scale-125"
+                      className="absolute inset-0 rounded-full bg-accent/25 transition-transform duration-500 group-hover:scale-125"
                     />
-                    <span className="relative flex h-full w-full items-center justify-center rounded-full bg-slime-400 text-ink-950 shadow-[0_0_0_6px_rgba(6,8,15,0.35),0_20px_50px_-10px_rgba(79,200,255,0.7)] transition-transform duration-300 group-hover:scale-105">
+                    <span className="relative flex h-full w-full items-center justify-center rounded-full bg-accent text-bg shadow-[0_0_0_6px_rgb(var(--bg)/0.35),0_20px_50px_-10px_rgb(var(--accent)/0.7)] transition-transform duration-300 group-hover:scale-105">
                       <Play className="ml-1 h-7 w-7 fill-current sm:h-9 sm:w-9" aria-hidden="true" />
                     </span>
                   </span>
-                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-ink-950/75 px-3 py-1.5 font-pixel text-[10px] uppercase tracking-[0.16em] text-fg backdrop-blur sm:bottom-5 sm:left-5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-slime-400" aria-hidden="true" />
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-bg/75 px-3 py-1.5 font-pixel text-[10px] uppercase tracking-[0.16em] text-text backdrop-blur sm:bottom-5 sm:left-5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
                     Watch trailer
                   </span>
                 </button>
@@ -137,13 +137,13 @@ export const FeaturedSection: React.FC = () => {
                   />
                 )}
                 <div className="min-w-0">
-                  <p className="font-pixel text-[10px] uppercase tracking-[0.16em] text-slime-200 sm:text-[11px]">
+                  <p className="font-pixel text-[10px] uppercase tracking-[0.16em] text-accent sm:text-[11px]">
                     {[item.period, release].filter(Boolean).join(' · ')}
                   </p>
                   <h3 className="mt-1 font-hero text-2xl font-black leading-none tracking-tight text-white sm:text-5xl">
                     {item.title}
                   </h3>
-                  {item.subtitle && <p className="mt-1.5 text-xs font-medium text-fg sm:mt-2 sm:text-sm">{item.subtitle}</p>}
+                  {item.subtitle && <p className="mt-1.5 text-xs font-medium text-text sm:mt-2 sm:text-sm">{item.subtitle}</p>}
                 </div>
               </div>
             </>
@@ -152,7 +152,7 @@ export const FeaturedSection: React.FC = () => {
 
         {/* Screenshot strip */}
         {shots.length > 1 && (
-          <div className="grid grid-cols-4 gap-2 border-b border-line bg-ink-950/40 p-2.5 sm:gap-3 sm:p-4">
+          <div className="grid grid-cols-4 gap-2 border-b border-line bg-bg/40 p-2.5 sm:gap-3 sm:p-4">
             {shots.map((shot, i) => {
               const selected = i === active && !playing
               return (
@@ -165,12 +165,12 @@ export const FeaturedSection: React.FC = () => {
                   }}
                   aria-pressed={selected}
                   aria-label={`Show ${shot.alt}`}
-                  className={`group relative aspect-video overflow-hidden rounded-lg ring-1 transition-[opacity,box-shadow] duration-200 ${
-                    selected ? 'opacity-100 ring-2 ring-slime-400' : 'opacity-55 ring-line hover:opacity-100 hover:ring-slime-400/40'
+                  className={`group relative aspect-video min-h-11 overflow-hidden rounded-lg ring-1 transition-[opacity,box-shadow] duration-200 ${
+                    selected ? 'opacity-100 ring-2 ring-accent' : 'opacity-55 ring-line hover:opacity-100 hover:ring-accent/40'
                   }`}
                 >
                   <img src={shot.src} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
-                  <span className="absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-ink-950/90 to-transparent px-2 pb-1 pt-4 text-left font-pixel text-[9px] uppercase tracking-[0.14em] text-fg sm:block">
+                  <span className="absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-bg/90 to-transparent px-2 pb-1 pt-4 text-left font-pixel text-[9px] uppercase tracking-[0.14em] text-text sm:block">
                     {shot.label}
                   </span>
                 </button>
@@ -182,7 +182,7 @@ export const FeaturedSection: React.FC = () => {
         {/* Body */}
         <div className="grid gap-8 p-5 sm:p-8 md:grid-cols-[1.2fr_1fr] md:gap-10">
           <div className="flex flex-col">
-            {item.description && <p className="text-[15px] leading-relaxed text-fg-muted">{item.description}</p>}
+            {item.description && <p className="text-[15px] leading-relaxed text-muted">{item.description}</p>}
 
             {platforms.length > 0 && (
               <div className="mt-6">
@@ -193,9 +193,9 @@ export const FeaturedSection: React.FC = () => {
                     return (
                       <li
                         key={p}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slime-400/20 bg-slime-400/[0.06] px-2.5 text-xs font-medium text-slime-100"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-accent-3/25 bg-accent-3/[0.07] px-2.5 text-xs font-medium text-accent-3"
                       >
-                        <Icon className="h-3.5 w-3.5 text-slime-300" aria-hidden="true" />
+                        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                         {p}
                       </li>
                     )

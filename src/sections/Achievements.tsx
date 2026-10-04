@@ -2,7 +2,6 @@ import React from 'react'
 import { ArrowUpRight, Check } from 'lucide-react'
 import { Section } from '@/components/ui/Section'
 import { useItemsOfKind } from '@/lib/content'
-import { revealDelay } from '@/lib/reveal'
 
 type Tier = 'gold' | 'silver' | 'bronze' | 'slime'
 
@@ -46,7 +45,7 @@ export const AchievementsSection: React.FC = () => {
   return (
     <Section id="achievements" eyebrow="achievements" title="Wins so far">
       <ul className={`grid gap-4 sm:gap-5 ${items.length > 1 ? 'lg:grid-cols-3' : ''}`}>
-        {items.map((item, i) => {
+        {items.map((item) => {
           const [result, ...rest] = item.title.split(' · ')
           const event = rest.length > 0 ? rest.join(' · ') : null
           const rank = rankOf(result!)
@@ -55,15 +54,14 @@ export const AchievementsSection: React.FC = () => {
           return (
             <li
               key={item.id}
-              style={revealDelay(i)}
-              className={`reveal medal-card card card-hover group relative flex flex-col overflow-hidden p-5 sm:p-6 ${TIER_CLASS[rank.tier]}`}
+              className={`medal-card card card-hover group relative flex flex-col overflow-hidden p-5 sm:p-6 ${TIER_CLASS[rank.tier]}`}
             >
               <div aria-hidden="true" className="medal-glow pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full" />
 
               <div className="relative flex items-center gap-4">
                 <span
                   aria-hidden="true"
-                  className="medal-disc flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-ink-950"
+                  className="medal-disc flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-bg"
                 >
                   {rank.glyph ? (
                     <span className={`relative z-10 font-hero font-black tracking-tight ${long ? 'text-sm' : 'text-lg'}`}>
@@ -75,17 +73,17 @@ export const AchievementsSection: React.FC = () => {
                 </span>
                 <div className="min-w-0">
                   <p className="medal-text font-hero text-[13px] font-bold uppercase tracking-[0.12em]">{rank.result}</p>
-                  {event && <h3 className="mt-1 font-display text-xl font-semibold leading-tight text-fg">{event}</h3>}
+                  {event && <h3 className="mt-1 font-display text-xl font-semibold leading-tight text-text">{event}</h3>}
                 </div>
               </div>
 
-              {item.subtitle && <p className="relative mt-4 text-sm font-medium text-fg">{item.subtitle}</p>}
-              {item.description && <p className="relative mt-1.5 text-sm leading-relaxed text-fg-muted">{item.description}</p>}
+              {item.subtitle && <p className="relative mt-4 text-sm font-medium text-text">{item.subtitle}</p>}
+              {item.description && <p className="relative mt-1.5 text-sm leading-relaxed text-muted">{item.description}</p>}
 
               <div className="relative mt-auto pt-5">
                 <span aria-hidden="true" className="medal-rule block h-px w-full" />
                 <div className="flex items-center justify-between gap-3 pt-1">
-                  {item.period && <span className="font-mono text-xs text-fg-faint">{item.period}</span>}
+                  {item.period && <span className="font-mono text-xs text-faint">{item.period}</span>}
                   {item.url && (
                     <a
                       href={item.url}

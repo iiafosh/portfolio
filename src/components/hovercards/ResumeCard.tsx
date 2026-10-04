@@ -14,12 +14,12 @@ export const ResumeCard: React.FC = () => {
 
   return (
     <HoverCardSurface>
-      <div className="flex items-center justify-between border-b border-line bg-white/[0.02] px-4 py-2.5">
-        <span className="inline-flex items-center gap-2 font-pixel text-[10px] uppercase tracking-[0.16em] text-fg-muted">
-          <FileText className="h-3.5 w-3.5 text-slime-300" aria-hidden="true" />
+      <div className="flex items-center justify-between border-b border-line bg-text/[0.02] px-4 py-2.5">
+        <span className="inline-flex items-center gap-2 font-pixel text-[10px] uppercase tracking-[0.16em] text-muted">
+          <FileText className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
           Resume
         </span>
-        <span className="font-mono text-[11px] text-fg-faint">1 page · A4</span>
+        <span className="font-mono text-[11px] text-faint">1 page · A4</span>
       </div>
 
       <div className="p-3">
@@ -50,7 +50,7 @@ export const ResumeCard: React.FC = () => {
 
         <Link
           to="/resume"
-          className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-lg px-1 text-xs font-semibold text-slime-300 transition-colors hover:text-slime-200"
+          className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-lg px-1 text-xs font-semibold text-accent underline-offset-4 transition-colors hover:underline"
         >
           Open resume <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>

@@ -65,7 +65,7 @@ export const ResumePage: React.FC = () => {
           Back
         </Link>
         <div className="flex items-center gap-3">
-          <span className="hidden font-mono text-xs text-fg-faint sm:inline">Pick “Save as PDF” in the print dialog</span>
+          <span className="hidden font-mono text-xs text-faint sm:inline">Pick “Save as PDF” in the print dialog</span>
           <button type="button" onClick={() => window.print()} className="btn-primary">
             <Download className="h-4 w-4" aria-hidden="true" />
             Download PDF

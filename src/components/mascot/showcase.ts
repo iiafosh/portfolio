@@ -48,6 +48,13 @@ const SLIME_TIPS: ShowcaseItem[] = [
     description: 'Or close it with the X. I will be back with something else in a minute.',
   },
   {
+    id: 'tip-skin',
+    category: 'Slime tip',
+    title: 'Try a new skin!',
+    description: "Pick a color in the header and I'll change too.",
+    link: { type: 'section', id: 'top', label: 'Back to the top' },
+  },
+  {
     id: 'tip-reincarnated',
     category: 'Slime tip',
     title: 'Yes, I am that slime.',

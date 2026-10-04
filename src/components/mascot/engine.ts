@@ -7,11 +7,13 @@ import { EYE_LX, EYE_MODES, EYE_RX, EYE_Y, MOUTH_MODES, SPRITE_ASPECT, type EyeM
 // never re-renders per frame.
 
 /** The floating dock lives in the top 80px; the slime never goes there. */
-export const TOP_SAFE = 80
+export const TOP_SAFE = 24
 const EDGE = 8
 const SLEEP_AFTER_MS = 25_000
 const MOUSE_FRESH_MS = 4_000
 const GRAVITY = 2400
+/** Droplets in the skin-change sparkle burst (the pool has 6). */
+const DROP_SPARKLES = 6
 
 type Kind =
   | 'idle'
@@ -31,6 +33,7 @@ type Kind =
   | 'drag'
   | 'flung'
   | 'dizzy'
+  | 'newskin'
 
 /** Behaviours picked at random after an idle pause, with relative weights. */
 const WEIGHTS: ReadonlyArray<readonly [Kind, number]> = [
@@ -52,7 +55,26 @@ const PETTABLE = new Set<Kind>(['idle', 'wander', 'chase', 'lookaround', 'dance'
 /** States a speech bubble may interrupt right away (others finish first). */
 const ANNOUNCE_NOW = new Set<Kind>(['idle', 'wander', 'chase', 'lookaround', 'dance', 'pet', 'sleep'])
 /** States whose face wins over the hover face. */
-const OWN_FACE = new Set<Kind>(['drag', 'flung', 'dizzy', 'sleep', 'wake', 'announce', 'zoomies'])
+const OWN_FACE = new Set<Kind>(['drag', 'flung', 'dizzy', 'sleep', 'wake', 'announce', 'zoomies', 'newskin'])
+/**
+ * States a skin change may interrupt right away. The rest (dragged, flung,
+ * dizzy, half off-screen peeking, mid-announce) finish first.
+ */
+const SKIN_NOW = new Set<Kind>([
+  'idle',
+  'wander',
+  'lookaround',
+  'chase',
+  'dance',
+  'pet',
+  'sleep',
+  'wake',
+  'eat',
+  'spin',
+  'bigjump',
+  'zoomies',
+  'newskin',
+])
 /** States resize can leave alone. */
 const RESIZE_SAFE = new Set<Kind>(['idle', 'sleep', 'pet', 'drag', 'lookaround', 'dance'])
 
@@ -205,6 +227,8 @@ export class SlimeEngine {
   private hovered = false
   private speaking = false
   private pendingAnnounce: (() => void) | null = null
+  private pendingSkin = false
+  private skin: string | undefined
   private announceCb: (() => void) | null = null
   private lastScrollY = 0
   private lastScrollT = 0
@@ -253,6 +277,7 @@ export class SlimeEngine {
     this.blinkAt = now + rand(1500, 4000)
     this.lastScrollY = window.scrollY
     this.lastScrollT = now
+    this.skin = document.documentElement.dataset.skin
     const c = this.corner()
     this.x = c.x
     this.y = c.y
@@ -266,6 +291,7 @@ export class SlimeEngine {
     window.addEventListener('scroll', this.onScroll, { passive: true })
     window.addEventListener('resize', this.onResize)
     document.addEventListener('visibilitychange', this.onVisibility)
+    window.addEventListener('skinchange', this.onSkinChange)
   }
 
   // ---- public API ------------------------------------------------------------
@@ -286,6 +312,7 @@ export class SlimeEngine {
     window.removeEventListener('scroll', this.onScroll)
     window.removeEventListener('resize', this.onResize)
     document.removeEventListener('visibilitychange', this.onVisibility)
+    window.removeEventListener('skinchange', this.onSkinChange)
   }
 
   setConfig(next: EngineConfig) {
@@ -321,6 +348,15 @@ export class SlimeEngine {
     }
     this.pendingAnnounce = cb
     if (ANNOUNCE_NOW.has(this.b.kind)) this.enter('announce')
+    this.kick()
+  }
+
+  /** "New skin!": a happy hop with sparkles in the new color. Wakes it up. */
+  skinChange() {
+    this.lastActivity = performance.now()
+    const k = this.b.kind
+    if (k === 'drag' || (!this.cfg.reduced && !SKIN_NOW.has(k))) this.pendingSkin = true
+    else this.enter('newskin')
     this.kick()
   }
 
@@ -426,6 +462,14 @@ export class SlimeEngine {
   }
 
   private onResize = () => this.resize()
+
+  private onSkinChange = (e: Event) => {
+    const detail = (e as CustomEvent<unknown>).detail
+    const skin = typeof detail === 'string' ? detail : document.documentElement.dataset.skin
+    if (skin !== undefined && skin === this.skin) return // re-applied, not changed
+    this.skin = skin
+    this.skinChange()
+  }
 
   private onVisibility = () => {
     if (document.hidden) this.halt()
@@ -669,6 +713,10 @@ export class SlimeEngine {
       case 'pet':
         b.dur = 0.6
         break
+      case 'newskin':
+        this.pendingSkin = false
+        this.jiggle(-0.1)
+        break
       case 'dizzy': {
         b.v = (((this.spinRot % 360) + 540) % 360) - 180
         this.spinRot = 0
@@ -681,6 +729,7 @@ export class SlimeEngine {
 
   private pickNext(now: number) {
     if (this.pendingAnnounce) return this.enter('announce')
+    if (this.pendingSkin) return this.enter('newskin')
     if (this.hovered) return this.enter('pet')
     if (now - this.lastActivity > SLEEP_AFTER_MS) return this.enter('sleep')
     if (this.speaking) {
@@ -775,6 +824,7 @@ export class SlimeEngine {
       case 'idle': {
         this.breathe(p)
         if (this.pendingAnnounce) this.enter('announce')
+        else if (this.pendingSkin) this.enter('newskin')
         else if (b.t >= b.dur) this.pickNext(now)
         break
       }
@@ -1200,6 +1250,39 @@ export class SlimeEngine {
         break
       }
 
+      case 'newskin': {
+        // "New skin!": squash, a happy hop with a sparkle burst, then a wiggle.
+        p.eyes = 'happy'
+        p.mouth = 'cat'
+        p.blush = 0.5
+        if (b.phase === 0) {
+          const k = Math.sin(Math.min(1, b.pt / 0.16) * Math.PI)
+          p.sx *= 1 + 0.14 * k
+          p.sy *= 1 - 0.16 * k
+          if (b.pt >= 0.16) {
+            this.sparkle(DROP_SPARKLES)
+            this.next()
+          }
+        } else if (b.phase === 1) {
+          const q = Math.min(1, b.pt / 0.46)
+          p.lift = Math.sin(q * Math.PI) * S * 0.5
+          const st = Math.abs(Math.cos(q * Math.PI))
+          p.sx *= 1 - 0.1 * st
+          p.sy *= 1 + 0.15 * st
+          p.glow = Math.sin(q * Math.PI) * 0.8
+          if (q >= 1) {
+            this.jiggle(0.16)
+            this.next()
+          }
+        } else {
+          const q = Math.min(1, b.pt / 0.45)
+          p.rot = Math.sin(b.pt * 16) * 6 * (1 - q)
+          p.glow = 0.3 * (1 - q)
+          if (q >= 1) this.toIdle(2, 4.5)
+        }
+        break
+      }
+
       case 'pet': {
         const w = Math.sin(b.t * 15) * 0.035
         p.sx *= 1 + w
@@ -1295,9 +1378,16 @@ export class SlimeEngine {
 
   private updateReduced(p: Pose) {
     const b = this.b
+    if (b.kind === 'idle' && this.pendingSkin) this.enter('newskin')
     if (b.kind === 'drag') {
       p.eyes = 'happy'
       p.mouth = 'cat'
+    } else if (b.kind === 'newskin') {
+      // Reduced motion: no hop, just a beaming face while the colors fade.
+      p.eyes = 'happy'
+      p.mouth = 'cat'
+      p.blush = 0.5
+      if (b.t >= 1.1) this.toIdle(0, 0)
     } else if (b.kind === 'announce') {
       p.bang = b.pt < 1 ? 1 : Math.max(0, 1 - (b.pt - 1) / 0.3)
       if (b.pt > 1.3) this.toIdle(0, 0)
@@ -1408,6 +1498,24 @@ export class SlimeEngine {
         rand(-1, 1) * S * 3,
         -rand(S * 2.2, S * 4.4),
         rand(0.45, 0.7),
+        Math.round(rand(3, 5)),
+      )
+    }
+  }
+
+  /** Skin-change sparkle: droplets fountain up and out from the top of the body. */
+  private sparkle(n: number) {
+    const S = this.S
+    const cx = this.x + S / 2
+    const top = this.y + this.H * 0.25
+    for (let i = 0; i < n; i++) {
+      const a = ((i + 0.5) / n - 0.5) * 2 // -1..1, spread left to right
+      this.spawnDrop(
+        cx + a * S * 0.35,
+        top + rand(-2, 2),
+        a * S * 3 + rand(-15, 15),
+        -rand(S * 3.4, S * 5),
+        rand(0.55, 0.8),
         Math.round(rand(3, 5)),
       )
     }

@@ -21,21 +21,54 @@ import type { SectionKey } from '@/content/types'
 /** Anchor to a home section only when that section is actually rendered. */
 function useSectionHref() {
   const { profile } = useProfile()
-  return (key: SectionKey) => (profile.section_order.includes(key) ? `#${key}` : undefined)
+  return (key: SectionKey) => {
+    if (profile.section_order.includes(key)) return `#${key}`
+    // Education lives in a tab of the Experience section (#education selects it).
+    if (key === 'education' && profile.section_order.includes('experience')) return '#education'
+    return undefined
+  }
+}
+
+/** "AI … student · games, apps & hardware" -> ["games", "apps", "hardware"] (the part that is a list). */
+function headlineWords(headline: string): string[] {
+  const list = headline.split(' · ').find((part) => /,|&|\band\b/.test(part) && !/\(/.test(part))
+  if (!list) return []
+  return list
+    .split(/,|&|\band\b/)
+    .map((w) => w.trim())
+    .filter(Boolean)
+}
+
+const WORD_COLORS = ['text-accent', 'text-accent-2', 'text-accent-3']
+
+/** "I build games, apps & hardware." with one accent per word. Falls back to the plain headline. */
+const ColoredHeadline: React.FC<{ headline: string }> = ({ headline }) => {
+  const words = headlineWords(headline)
+  if (words.length < 2) {
+    return <p className="mt-6 max-w-measure font-display text-xl font-semibold leading-snug text-text sm:text-2xl">{headline}</p>
+  }
+  return (
+    <p className="mt-6 font-display text-[1.65rem] font-semibold leading-tight tracking-tight text-text sm:text-[2rem]">
+      I build{' '}
+      {words.map((w, i) => (
+        <React.Fragment key={w}>
+          <span className={WORD_COLORS[i % WORD_COLORS.length]}>{w}</span>
+          {i < words.length - 2 ? ', ' : i === words.length - 2 ? ' & ' : '.'}
+        </React.Fragment>
+      ))}
+    </p>
+  )
 }
 
 const StatusChip: React.FC = () => {
   const { profile } = useProfile()
   return (
-    <p className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-line-strong bg-ink-900/60 px-3 py-1.5 text-xs text-fg-muted backdrop-blur sm:rounded-full">
+    <p className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-line-strong bg-surface/60 px-3 py-1.5 text-xs text-muted sm:rounded-full">
       {profile.availability && (
         <>
-          <span className="relative flex h-2 w-2" aria-hidden="true">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live opacity-50" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-live" />
-          </span>
-          <span className="font-medium text-fg">{profile.availability}</span>
-          <span className="hidden text-fg-faint sm:inline" aria-hidden="true">
+          <span className="h-2 w-2 rounded-full bg-ok shadow-[0_0_0_3px_rgb(var(--ok)/0.15)]" aria-hidden="true" />
+          <span className="font-medium text-text">{profile.availability}</span>
+          <span className="hidden text-faint sm:inline" aria-hidden="true">
             /
           </span>
         </>
@@ -45,6 +78,61 @@ const StatusChip: React.FC = () => {
         {profile.location}
       </span>
     </p>
+  )
+}
+
+/** Hand-drawn arrow for the margin note. */
+const ScribbleArrow: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg viewBox="0 0 40 44" aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M30 3c-6 3-15 9-16 20-.6 6 1 11 3 16" />
+    <path d="M10 33l7 7 5-9" />
+  </svg>
+)
+
+/**
+ * Portrait with two tilted snapshots behind it (Ted-style photo stack): the
+ * fosh&fish app icon and the Damietta Hackathon team photo. A handwritten
+ * note points at the game.
+ */
+const PhotoStack: React.FC = () => {
+  const { profile } = useProfile()
+  const { items: projects } = useItemsOfKind('project')
+  const featured = pickFeatured(projects)
+  const game = featured && (featured.image_url ?? '').includes('fosh-and-fish') ? featured : null
+  const firstGame = !!game?.subtitle && /\bfirst game\b/i.test(game.subtitle)
+  const hackathon = projects.find((p) => (p.image_url ?? '').includes('damietta'))
+
+  return (
+    <div className="relative mx-auto mt-4 hidden h-[212px] w-full max-w-[290px] sm:block">
+      {game && (
+        <span className="snap snap-left left-0 top-[58px] h-[112px] w-[100px]" aria-hidden="true">
+          <img src="/media/fosh-and-fish-icon.png" alt="" width={90} height={90} loading="eager" decoding="async" />
+        </span>
+      )}
+      {hackathon?.image_url && (
+        <span className="snap snap-right right-0 top-[44px] h-[112px] w-[110px]" aria-hidden="true">
+          <img
+            src={hackathon.image_url}
+            alt=""
+            width={100}
+            height={90}
+            style={{ objectPosition: '45% 100%' }}
+            loading="eager"
+            decoding="async"
+          />
+        </span>
+      )}
+      <div className="absolute left-1/2 top-[30px] -translate-x-1/2">
+        <Portrait src={profile.avatar_url} name={profile.name} size={150} eager />
+      </div>
+
+      {game && firstGame && (
+        <p className="pointer-events-none absolute -left-1 -top-1 text-accent-2" aria-hidden="true">
+          <span className="hand block -rotate-6 text-[1.35rem]">my first game</span>
+          <ScribbleArrow className="ml-2 h-10 w-9" />
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -73,7 +161,7 @@ const PlayerCard: React.FC = () => {
     rows.push({
       label: 'Main quest',
       value: target ? (
-        <a href={target} className="group inline-flex items-center gap-1 text-slime-200 transition-colors hover:text-slime-100">
+        <a href={target} className="group -my-3 inline-flex min-h-11 items-center gap-1 text-accent underline decoration-accent/0 underline-offset-4 transition-colors hover:decoration-accent/60">
           {quest}
           <ArrowUpRight className="h-3.5 w-3.5 opacity-70 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
         </a>
@@ -84,38 +172,25 @@ const PlayerCard: React.FC = () => {
   }
 
   return (
-    <aside
-      aria-label="Player card"
-      className="holo-group card hud relative overflow-hidden rounded-3xl p-5 sm:p-6"
-    >
+    <aside aria-label="Player card" className="holo-group card hud relative rounded-3xl p-5 sm:p-6">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 left-1/2 h-48 w-72 -translate-x-1/2 rounded-full"
-        style={{ background: 'radial-gradient(closest-side, rgba(79,200,255,0.22), transparent)' }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 overflow-hidden rounded-t-3xl"
+        style={{ background: 'radial-gradient(60% 80% at 50% 0%, rgb(var(--accent) / 0.14), transparent)' }}
       />
 
       <div className="relative flex items-center justify-between">
-        <span className="label text-slime-300">Player card</span>
-        <span className="font-mono text-[11px] text-fg-faint">@{profile.handle}</span>
+        <span className="label text-accent">Player card</span>
+        <span className="font-mono text-[11px] text-faint">@{profile.handle}</span>
       </div>
 
-      {/* Portrait: desktop only; phones show a smaller one at the top of the hero. */}
-      <div className="relative mt-5 hidden flex-col items-center lg:flex">
-        <Portrait src={profile.avatar_url} name={profile.name} size={168} orbit eager />
-        <p className="mt-4 font-display text-lg font-semibold leading-tight text-fg">{profile.name}</p>
-        {profile.availability && (
-          <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-fg-muted">
-            <span className="h-1.5 w-1.5 rounded-full bg-live" aria-hidden="true" />
-            {profile.availability}
-          </p>
-        )}
-      </div>
+      <PhotoStack />
 
-      <dl className="relative mt-5 divide-y divide-line border-t border-line lg:mt-6">
+      <dl className="relative mt-5 divide-y divide-line border-t border-line">
         {rows.map((r) => (
-          <div key={r.label} className="grid grid-cols-[6.25rem_1fr] items-baseline gap-3 py-2.5">
+          <div key={r.label} className="grid grid-cols-[6rem_1fr] items-baseline gap-3 py-2.5">
             <dt className="label">{r.label}</dt>
-            <dd className="min-w-0 text-sm leading-snug text-fg">{r.value}</dd>
+            <dd className="min-w-0 text-sm leading-snug text-text">{r.value}</dd>
           </div>
         ))}
       </dl>
@@ -150,7 +225,7 @@ const StatsStrip: React.FC = () => {
     stats.push({
       value: (
         <>
-          <span className="mr-1 align-top font-pixel text-xs text-slime-300">LV</span>
+          <span className="mr-1 align-top font-pixel text-xs text-accent">LV</span>
           {level}
         </>
       ),
@@ -162,15 +237,15 @@ const StatsStrip: React.FC = () => {
   return (
     <ul
       aria-label="At a glance"
-      className={`mt-12 grid grid-cols-2 overflow-hidden rounded-2xl border border-line bg-ink-900/50 backdrop-blur-sm sm:mt-16 ${
+      className={`mt-12 grid grid-cols-2 overflow-hidden rounded-2xl border border-line bg-surface/50 sm:mt-14 ${
         stats.length >= 4 ? 'lg:grid-cols-4' : stats.length === 3 ? 'sm:grid-cols-3' : ''
       }`}
     >
       {stats.map((s, i) => {
         const body = (
           <>
-            <span className="block font-display text-4xl font-bold tabular-nums leading-none tracking-tight text-fg sm:text-5xl">{s.value}</span>
-            <span className="mt-2 block text-xs leading-snug text-fg-muted">{s.label}</span>
+            <span className="block font-display text-4xl font-bold tabular-nums leading-none tracking-tight text-text sm:text-[2.75rem]">{s.value}</span>
+            <span className="mt-2 block text-xs leading-snug text-muted">{s.label}</span>
           </>
         )
         // Hairlines between cells for both the 2x2 and the 1x4 layouts.
@@ -182,7 +257,7 @@ const StatsStrip: React.FC = () => {
         return (
           <li key={s.label} className={borders}>
             {s.href ? (
-              <a href={s.href} className="group block h-full p-4 transition-colors hover:bg-white/[0.03] sm:p-5">
+              <a href={s.href} className="group block h-full p-4 transition-colors hover:bg-text/[0.03] sm:p-5">
                 {body}
               </a>
             ) : (
@@ -201,19 +276,19 @@ export const HeroSection: React.FC = () => {
   const firstSection = profile.section_order[0]
 
   return (
-    <section id="top" className="scroll-mt-24 pt-4 sm:pt-12 lg:pt-16" aria-label="Introduction">
+    <section id="top" className="pt-2 sm:pt-6" aria-label="Introduction">
       <HoverCardGroup>
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="min-w-0 animate-fade-up">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
+          <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <span className="holo-group lg:hidden">
-                <Portrait src={profile.avatar_url} name={profile.name} size={60} eager />
+              <span className="holo-group sm:hidden">
+                <Portrait src={profile.avatar_url} name={profile.name} size={56} eager />
               </span>
               <StatusChip />
             </div>
 
-            <p className="mt-7 font-mono text-sm text-fg-muted sm:mt-10">
-              hi, i&apos;m{profile.handle && <span className="text-slime-300"> @{profile.handle}</span>}
+            <p className="mt-7 font-mono text-sm text-muted sm:mt-9">
+              hi, i&apos;m{profile.handle && <span className="text-accent"> @{profile.handle}</span>}
             </p>
             <h1 className="mt-2">
               <HoverCard id="linkedin-name" label="LinkedIn profile preview" content={<LinkedInCard />} align="start">
@@ -225,7 +300,7 @@ export const HeroSection: React.FC = () => {
                     </span>
                   </span>
                   {rest && (
-                    <span className="mt-2 font-hero text-base font-bold uppercase tracking-[0.28em] text-fg-muted min-[400px]:text-lg sm:mt-3 sm:text-2xl">
+                    <span className="mt-2 font-hero text-base font-bold uppercase tracking-[0.28em] text-muted min-[400px]:text-lg sm:mt-3 sm:text-xl">
                       {rest}
                     </span>
                   )}
@@ -233,10 +308,8 @@ export const HeroSection: React.FC = () => {
               </HoverCard>
             </h1>
 
-            <p className="mt-7 max-w-xl font-display text-lg font-semibold leading-snug text-fg sm:text-xl">
-              {profile.headline}
-            </p>
-            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-fg-muted">{profile.bio}</p>
+            <ColoredHeadline headline={profile.headline} />
+            <p className="mt-4 max-w-measure text-[15px] leading-relaxed text-muted">{profile.bio}</p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <CopyEmailButton email={profile.email} />
@@ -276,9 +349,7 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          <div className="animate-fade-up [animation-delay:120ms]">
-            <PlayerCard />
-          </div>
+          <PlayerCard />
         </div>
 
         <StatsStrip />
@@ -286,7 +357,7 @@ export const HeroSection: React.FC = () => {
         {firstSection && (
           <a
             href={`#${firstSection}`}
-            className="mt-8 hidden items-center gap-2 text-xs text-fg-faint transition-colors hover:text-fg-muted sm:inline-flex"
+            className="mt-6 hidden min-h-11 items-center gap-2 text-xs text-faint transition-colors hover:text-text sm:inline-flex"
           >
             <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Scroll to see what I&apos;ve shipped</span>

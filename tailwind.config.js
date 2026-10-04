@@ -1,4 +1,9 @@
 /** @type {import('tailwindcss').Config} */
+
+// Every colour is a CSS variable defined in src/index.css (:root + html[data-skin]).
+// Channels are space-separated RGB so opacity modifiers (bg-accent/10) keep working.
+const v = (name) => `rgb(var(--${name}) / <alpha-value>)`
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
@@ -10,37 +15,49 @@ export default {
         display: ['"Chakra Petch"', 'Geist', 'sans-serif'],
         hero: ['Orbitron', '"Chakra Petch"', 'sans-serif'],
         pixel: ['Silkscreen', 'monospace'],
+        // Handwritten margin notes.
+        hand: ['Caveat', 'cursive'],
       },
       colors: {
-        ink: {
-          950: '#06080f',
-          900: '#0a0e19',
-          850: '#0e1322',
-          800: '#121a2c',
-          700: '#1b2540',
-        },
-        // The one accent, sampled from the Rimuru slime mascot.
+        // Semantic tokens (use these).
+        bg: v('bg'),
+        surface: { DEFAULT: v('surface'), 2: v('surface-2') },
+        text: v('text'),
+        muted: v('muted'),
+        faint: v('faint'),
+        accent: { DEFAULT: v('accent'), strong: v('accent-strong'), 2: v('accent-2'), 3: v('accent-3') },
+        ok: v('ok'),
+        line: { DEFAULT: 'var(--line)', strong: 'var(--line-strong)' },
+
+        // Legacy aliases, mapped onto the semantic tokens so older markup
+        // (src/components/mascot) keeps following the active skin.
+        // Do not use in new code.
         slime: {
-          100: '#dff6ff',
-          200: '#b5ecff',
-          300: '#86dcff',
-          400: '#4fc8ff',
-          500: '#22adf0',
-          600: '#1189c7',
-          glow: 'rgba(79, 200, 255, 0.35)',
+          100: v('accent'),
+          200: v('accent'),
+          300: v('accent'),
+          400: v('accent'),
+          500: v('accent-strong'),
+          600: v('accent-strong'),
+          glow: 'var(--slime-glow)',
         },
-        live: '#4ade80',
-        fg: {
-          DEFAULT: '#e7edf8',
-          muted: '#a3aec4',
-          // ~5:1 on ink-950, so it passes AA for small meta text.
-          faint: '#76829c',
+        ink: {
+          950: v('bg'),
+          900: v('bg'),
+          850: v('surface'),
+          800: v('surface'),
+          700: v('surface-2'),
         },
-        line: 'rgba(148, 180, 255, 0.10)',
+        fg: { DEFAULT: v('text'), muted: v('muted'), faint: v('faint') },
+        live: v('ok'),
       },
       boxShadow: {
-        card: '0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 48px -24px rgba(0,0,0,0.8)',
-        glow: '0 0 0 1px rgba(79,200,255,0.35), 0 0 28px -4px rgba(79,200,255,0.45)',
+        card: '0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 40px -24px rgb(0 0 0 / 0.75)',
+        glow: '0 0 0 1px rgb(var(--accent) / 0.35), 0 0 28px -4px rgb(var(--accent) / 0.45)',
+      },
+      maxWidth: {
+        content: '980px',
+        measure: '68ch',
       },
       keyframes: {
         'fade-up': {

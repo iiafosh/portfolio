@@ -12,7 +12,7 @@ export const Avatar: React.FC<AvatarProps> = ({ src, name, fallback, className =
   const [failed, setFailed] = useState(false)
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-ink-800 font-display font-bold text-slime-200 ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface font-display font-bold text-accent ${className}`}
     >
       {src && !failed ? (
         <img

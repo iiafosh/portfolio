@@ -23,10 +23,13 @@ const SECTIONS: Record<SectionKey, React.FC> = {
 
 export const HomePage: React.FC = () => {
   const { profile } = useProfile()
+  // Education renders as a tab of the Experience section; it only gets its
+  // own section when Experience is not on the page.
+  const order = profile.section_order.filter((key) => key !== 'education' || !profile.section_order.includes('experience'))
   return (
-    <div className="space-y-24 sm:space-y-32">
+    <div className="space-y-20 sm:space-y-28">
       <HeroSection />
-      {profile.section_order.map((key) => {
+      {order.map((key) => {
         const Component = SECTIONS[key]
         return Component ? <Component key={key} /> : null
       })}

@@ -16,24 +16,27 @@ interface SectionProps {
  * Standard home-page section: ghost index numeral, pixel eyebrow, display
  * title and a hairline running to the right edge. The numeral comes from a
  * CSS counter, so numbering stays sequential when empty sections are hidden
- * or the owner reorders them.
+ * or the owner reorders them. The chapter rail reads `data-chapter`.
  */
-export const Section: React.FC<SectionProps> = ({ id, eyebrow, title, lede, action, children }) => (
-  <section id={id} className="numbered-section scroll-mt-24" aria-labelledby={`${id}-title`}>
-    <header className="reveal mb-8 flex items-end gap-4 sm:mb-10 sm:gap-6">
-      <span aria-hidden="true" className="section-index -mb-1 shrink-0" />
-      <div className="min-w-0 flex-1">
-        <p className="eyebrow section-eyebrow">{eyebrow.replace(/^\s*\d+\s*\/\/\s*/, '')}</p>
-        <div className="mt-2 flex items-center gap-4 sm:gap-6">
-          <h2 id={`${id}-title`} className="section-title">
-            {title}
-          </h2>
-          <span aria-hidden="true" className="section-rule hidden translate-y-1 sm:block" />
-          {action}
+export const Section: React.FC<SectionProps> = ({ id, eyebrow, title, lede, action, children }) => {
+  const label = eyebrow.replace(/^\s*\d+\s*\/\/\s*/, '')
+  return (
+    <section id={id} data-chapter={label} className="numbered-section" aria-labelledby={`${id}-title`}>
+      <header className="mb-8 flex items-end gap-4 sm:mb-10 sm:gap-5">
+        <span aria-hidden="true" className="section-index -mb-1 shrink-0" />
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow section-eyebrow">{label}</p>
+          <div className="mt-2 flex items-center gap-4 sm:gap-6">
+            <h2 id={`${id}-title`} className="section-title">
+              {title}
+            </h2>
+            <span aria-hidden="true" className="section-rule hidden translate-y-1 sm:block" />
+            {action}
+          </div>
+          {lede && <p className="mt-2 max-w-measure text-sm leading-relaxed text-muted">{lede}</p>}
         </div>
-        {lede && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-fg-muted">{lede}</p>}
-      </div>
-    </header>
-    {children}
-  </section>
-)
+      </header>
+      {children}
+    </section>
+  )
+}
