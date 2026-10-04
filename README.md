@@ -1,5 +1,7 @@
 # afosh · portfolio
 
+Live: **https://afosh.vercel.app**
+
 Personal site of **Mostafa Kamal Shabara** ([@iiafosh](https://github.com/iiafosh) · [LinkedIn](https://www.linkedin.com/in/mostafa-kamal-3731453a9/)): AI & Informatics (Robotics) student at Horus University in Egypt, creator of [fosh&fish](https://github.com/iiafosh/fosh-and-fish).
 
 **Stack:** Vite · React 18 · TypeScript · TanStack Router · Tailwind CSS. Fully static: no backend, no environment variables.
