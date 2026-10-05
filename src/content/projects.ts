@@ -27,13 +27,13 @@ export const projects: Project[] = [
     size: "wide",
     featured: true,
     cover: {
-      src: "/media/fosh-and-fish-cover.jpg",
+      src: "/media/fosh-and-fish-cover.webp",
       alt: "fosh&fish cover: a fisherman casting from a boat near a beach shop",
       width: 1280,
       height: 720,
     },
     cardImage: {
-      src: "/media/fosh-and-fish-gameplay.jpg",
+      src: "/media/fosh-and-fish-gameplay.webp",
       alt: "fosh&fish gameplay: a cruise ship fishing in a coral sea",
       position: "50% 46%",
       zoom: 1.2,
@@ -41,13 +41,13 @@ export const projects: Project[] = [
       height: 720,
     },
     gallery: [
-      { src: "/media/fosh-and-fish-gameplay.jpg", alt: "fosh&fish gameplay", width: 1280, height: 720 },
-      { src: "/media/fosh-and-fish-biomes.jpg", alt: "The seven fosh&fish biomes", width: 1280, height: 720 },
-      { src: "/media/fosh-and-fish-shop.jpg", alt: "The fosh&fish shop screen", width: 1280, height: 720 },
+      { src: "/media/fosh-and-fish-gameplay.webp", alt: "fosh&fish gameplay", width: 1280, height: 720 },
+      { src: "/media/fosh-and-fish-biomes.webp", alt: "The seven fosh&fish biomes", width: 1280, height: 720 },
+      { src: "/media/fosh-and-fish-shop.webp", alt: "The fosh&fish shop screen", width: 1280, height: 720 },
     ],
     video: {
-      src: "https://github.com/iiafosh/fosh-and-fish/releases/download/v0.1-beta/fosh-and-fish-trailer-16x9.mp4",
-      poster: "/media/fosh-and-fish-cover.jpg",
+      src: "/media/fosh-and-fish-trailer.webm",
+      poster: "/media/fosh-and-fish-cover.webp",
     },
     vignette: "fish",
     role: "Solo — design, Godot scripting, Blender art pipeline, releases",
@@ -108,7 +108,7 @@ export const projects: Project[] = [
     status: "3rd place · Green Loop",
     featured: true,
     cover: {
-      src: "/media/respark-booth.jpg",
+      src: "/media/respark-booth.webp",
       alt: "Standing next to the ReSpark roll-up banner at Green Loop",
       position: "50% 30%",
       width: 960,
@@ -162,7 +162,7 @@ export const projects: Project[] = [
     categories: ["Hardware"],
     status: "Hackathon build",
     cover: {
-      src: "/media/damietta-hackathon.jpg",
+      src: "/media/damietta-hackathon.webp",
       alt: "The team at the Damietta Hackathon with the dashboard on two laptops",
       position: "50% 40%",
       width: 652,

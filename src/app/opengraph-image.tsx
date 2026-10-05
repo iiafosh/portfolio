@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { ImageResponse } from "next/og"
+import sharp from "sharp"
 
 import { site } from "@/content/site"
 
@@ -15,7 +16,8 @@ const fonts = join(process.cwd(), "src", "assets", "fonts")
 const [bold, sans, avatar] = await Promise.all([
   readFile(join(fonts, "Geist-Bold.ttf")),
   readFile(join(fonts, "Geist-Medium.ttf")),
-  readFile(join(process.cwd(), "public", "media", "avatar.jpg"), "base64"),
+  // Satori can't read WebP, so the portrait is re-encoded to JPEG for the card.
+  sharp(join(process.cwd(), "public", "media", "avatar.webp")).jpeg({ quality: 90 }).toBuffer().then((b) => b.toString("base64")),
 ])
 
 const SLIME = `data:image/svg+xml;utf8,${encodeURIComponent(

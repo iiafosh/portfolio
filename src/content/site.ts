@@ -24,7 +24,7 @@ export const site = {
   timeZone: "Africa/Cairo",
   email: "mk1440165@gmail.com",
   availability: "Open to internships & freelance",
-  avatar: "/media/avatar.jpg",
+  avatar: "/media/avatar.webp",
   socials: {
     github: { label: "GitHub", handle: "iiafosh", href: "https://github.com/iiafosh" },
     linkedin: {
