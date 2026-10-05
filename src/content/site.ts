@@ -30,11 +30,11 @@ export const site = {
     linkedin: {
       label: "LinkedIn",
       handle: "mostafa-kamal",
-      href: "https://www.linkedin.com/in/mostafa-kamal-3731453a9/",
+      href: "https://www.linkedin.com/in/mostafa-kmal-3731453a9/",
     },
   },
   /** LinkedIn activity feed — the source for every story on this site. */
-  posts: "https://www.linkedin.com/in/mostafa-kamal-3731453a9/recent-activity/all/",
+  posts: "https://www.linkedin.com/in/mostafa-kmal-3731453a9/recent-activity/all/",
   repo: "https://github.com/iiafosh/portfolio",
   /** The pet that lives in the dock. */
   pet: { name: "Rimuru" },

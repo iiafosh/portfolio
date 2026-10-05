@@ -23,7 +23,7 @@ export const cv = {
   name: site.name,
   headline: "AI & Informatics (Robotics) Student · Games, Apps & Hardware",
   contact: [
-    { kind: "linkedin", label: "linkedin.com/in/mostafa-kamal-3731453a9", href: site.socials.linkedin.href },
+    { kind: "linkedin", label: "linkedin.com/in/mostafa-kmal-3731453a9", href: site.socials.linkedin.href },
     { kind: "github", label: "github.com/iiafosh", href: site.socials.github.href },
     { kind: "web", label: "afosh.dev", href: site.url },
     { kind: "mail", label: site.email, href: `mailto:${site.email}` },
