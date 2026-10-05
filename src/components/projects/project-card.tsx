@@ -14,6 +14,8 @@ import { Vignette } from "./vignettes"
 export function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
   const still = project.cardImage ?? project.cover
   const showCover = still && project.cardMedia !== "vignette"
+  const hero = project.size === "hero"
+  const spans = hero || project.size === "wide"
 
   return (
     <TiltCard max={4} className="group h-full rounded-2xl">
@@ -25,12 +27,13 @@ export function ProjectCard({ project, onOpen }: { project: Project; onOpen: () 
       />
       <div className="relative h-full overflow-hidden rounded-2xl bg-surface-1 shadow-[0_0_0_1px_var(--border),var(--shadow-3)]">
         {showCover && still ? (
-          <div className="absolute inset-0" style={{ transform: `scale(${still.zoom ?? 1})` }}>
+          <div className="absolute inset-0" style={{ transform: `scale(${hero ? 1 : (still.zoom ?? 1)})` }}>
             <Image
               src={still.src}
               alt={still.alt}
               fill
-              sizes="(min-width: 1024px) 40rem, (min-width: 640px) 50vw, 100vw"
+              sizes={spans ? "(min-width: 1280px) 80rem, 100vw" : "(min-width: 1280px) 40rem, (min-width: 640px) 50vw, 100vw"}
+              priority={hero}
               className="object-cover transition-transform duration-700 ease-[var(--ease-swift)] group-hover:scale-[1.03]"
               style={{ objectPosition: still.position ?? "50% 50%" }}
             />
@@ -45,13 +48,22 @@ export function ProjectCard({ project, onOpen }: { project: Project; onOpen: () 
           <div className="pointer-events-none absolute inset-0 bg-black/15 transition-colors duration-500 group-hover:bg-transparent" />
         ) : null}
 
-        <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-5 text-left sm:p-6">
+        <div className={cn("pointer-events-none absolute inset-0 flex flex-col justify-between p-5 text-left sm:p-7", hero && "lg:p-10")}>
           <span className="w-fit rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[10.5px] font-semibold tracking-[0.08em] text-white uppercase backdrop-blur-md">
             {project.status}
           </span>
           <div className="translate-y-2 transition-transform duration-500 ease-[var(--ease-swift)] group-hover:translate-y-0">
-            <h2 className="font-display text-xl font-bold tracking-[-0.035em] text-white sm:text-2xl">{project.title}</h2>
-            <p className="mt-1 text-[0.8125rem] leading-snug text-white/80">{project.tagline}</p>
+            <h2
+              className={cn(
+                "font-display text-2xl font-bold tracking-[-0.035em] text-white sm:text-3xl",
+                hero && "sm:text-4xl lg:text-5xl",
+              )}
+            >
+              {project.title}
+            </h2>
+            <p className={cn("mt-1.5 max-w-xl text-sm leading-snug text-white/80", hero && "sm:text-base lg:text-lg")}>
+              {project.tagline}
+            </p>
             <p className="mt-2 flex items-center gap-1 text-[11px] font-medium tracking-[0.06em] text-white/70 uppercase opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               {project.period} · {project.categories.join(" · ")}
             </p>

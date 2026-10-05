@@ -198,6 +198,7 @@ export class SlimeEngine {
     window.addEventListener("click", this.onClick, { capture: true })
     window.addEventListener("touchstart", this.onTouchStart, { capture: true, passive: false })
     window.addEventListener("dblclick", this.onDoubleClick, { capture: true })
+    window.addEventListener("blur", this.onBlur)
     window.addEventListener("slime:say", this.onSayRequest)
     document.addEventListener("visibilitychange", this.onVisibility)
 
@@ -227,6 +228,7 @@ export class SlimeEngine {
     window.removeEventListener("click", this.onClick, { capture: true })
     window.removeEventListener("touchstart", this.onTouchStart, { capture: true })
     window.removeEventListener("dblclick", this.onDoubleClick, { capture: true })
+    window.removeEventListener("blur", this.onBlur)
     window.removeEventListener("slime:say", this.onSayRequest)
     document.removeEventListener("visibilitychange", this.onVisibility)
     this.observer?.disconnect()
@@ -879,7 +881,10 @@ export class SlimeEngine {
 
   private onPointerDown = (e: PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return
-    if (this.grab || !this.hit(e.clientX, e.clientY)) return
+    if (this.grab) return
+    // a fresh press elsewhere means any click left over from a past grab never came
+    this.consumeClickUntil = 0
+    if (!this.hit(e.clientX, e.clientY)) return
     e.preventDefault()
     e.stopPropagation()
     this.consumeClickUntil = performance.now() + 60_000
@@ -970,6 +975,15 @@ export class SlimeEngine {
       this.fling(this.pointerVelocity())
     }
     this.setCursor(this.hit(e.clientX, e.clientY) && e.pointerType === "mouse" ? "grab" : null)
+  }
+
+  // The release can land outside the window (alt-tab, a context menu) and
+  // never reach us: drop the grab so it can't keep swallowing clicks.
+  private onBlur = () => {
+    if (!this.grab) return
+    this.grab = null
+    this.consumeClickUntil = 0
+    this.setCursor(null)
   }
 
   private onClick = (e: MouseEvent) => {

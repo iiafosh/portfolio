@@ -341,6 +341,11 @@ html[data-slime-cursor="grabbing"] * {
   --column: 64rem;
 }
 
+/* the projects bento gets the most room so each tile reads big */
+:root:has([data-column="xwide"]) {
+  --column: 80rem;
+}
+
 /* component classes sit in a layer so Tailwind utilities can override them */
 @layer components {
   /* ── Ambient: paper grain + drafting guides (cali.so) ─────────────── */

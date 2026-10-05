@@ -110,7 +110,7 @@ export function ProjectGridView({
 
       <motion.ul
         layout={!reduce}
-        className="mt-6 grid grid-flow-row-dense auto-rows-[18rem] grid-cols-1 gap-4 sm:auto-rows-[19rem] sm:grid-cols-2 lg:grid-cols-3"
+        className="mt-6 grid grid-flow-row-dense auto-rows-[20rem] grid-cols-1 gap-4 sm:auto-rows-[22rem] sm:grid-cols-2 sm:gap-5 lg:auto-rows-[24rem]"
       >
         <AnimatePresence mode="popLayout" initial={false}>
           {visible.map((project, i) => (
@@ -121,7 +121,10 @@ export function ProjectGridView({
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               exit={reduce ? undefined : { opacity: 0, scale: 0.96, filter: "blur(4px)", transition: { duration: 0.18 } }}
               transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1], delay: reduce ? 0 : Math.min(i, 6) * 0.04 }}
-              className={cn(project.size === "wide" && category === "All" ? "sm:col-span-2" : undefined)}
+              className={cn(
+                project.size === "hero" && "sm:col-span-2 lg:row-span-2",
+                project.size === "wide" && category === "All" && "sm:col-span-2",
+              )}
             >
               <ProjectCard project={project} onOpen={() => onOpen(project.slug)} />
             </motion.li>
@@ -130,9 +133,4 @@ export function ProjectGridView({
       </motion.ul>
     </>
   )
-}
-
-/** Server-rendered stand-in until the search params are known. */
-export function ProjectGridFallback({ items }: { items: Project[] }) {
-  return <ProjectGridView items={items} category="All" onCategory={() => {}} onOpen={() => {}} />
 }

@@ -1,7 +1,8 @@
 import { site } from "./site"
 import type { Project, ProjectCategory } from "./types"
 
-// Projects tab. Newest first; `size: "wide"` takes two columns in the bento.
+// Projects tab. Newest first; `size: "hero"` fills the bento's full width at
+// double height, `size: "wide"` takes both columns.
 // Stories are Mostafa's own LinkedIn posts, translated from Arabic.
 
 export const PROJECT_CATEGORIES: readonly ("All" | ProjectCategory)[] = [
@@ -24,7 +25,7 @@ export const projects: Project[] = [
     period: "Oct 2026",
     categories: ["Games"],
     status: "0.1 beta · playable",
-    size: "wide",
+    size: "hero",
     featured: true,
     cover: {
       src: "/media/fosh-and-fish-cover.webp",
@@ -168,7 +169,6 @@ export const projects: Project[] = [
       width: 652,
       height: 490,
     },
-    size: "wide",
     vignette: "watch",
     cardMedia: "vignette",
     role: "Technical research & the LoRa link",

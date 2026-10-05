@@ -52,8 +52,8 @@ export interface Project {
   period: string
   categories: ProjectCategory[]
   status: string
-  /** Bento size in the grid. */
-  size?: "wide" | "normal"
+  /** Bento size in the grid: "hero" spans the full width at double height. */
+  size?: "hero" | "wide" | "normal"
   featured?: boolean
   cover?: MediaImage
   /** What the card shows: the cover photo (default when there is one) or the live vignette. */
