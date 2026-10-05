@@ -107,6 +107,13 @@ export const projects: Project[] = [
     categories: ["Apps", "Web", "AI"],
     status: "3rd place · Green Loop",
     featured: true,
+    cover: {
+      src: "/media/respark-booth.jpg",
+      alt: "Standing next to the ReSpark roll-up banner at Green Loop",
+      position: "50% 30%",
+      width: 960,
+      height: 1706,
+    },
     vignette: "respark",
     role: "Mobile app — built with Abdelrahman Mohsen",
     team: [
